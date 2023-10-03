@@ -1,0 +1,13 @@
+<form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    {% for inkling_form in formset %}
+        {{ inkling_form.id }}
+        <h4>Inkling</h4>
+        {{ inkling_form.as_p }}
+    {% endfor %}
+    {{ formset.management_form }}
+    
+    <button type="submit">Save</button>
+</form>

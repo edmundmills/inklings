@@ -2,5 +2,13 @@
 
 {% block content %}
 <h2>{{ memo.title }}</h2>
+
+{% if memo.tags.all %}
+    {% for tag in memo.tags.all %}
+        <a href="{% url 'view_tag' tag.id %}">{{ tag.name }}</a> 
+    {% endfor %}
+{% endif %}
+
+
 <p>{{ memo.content }}</p>
 {% endblock %}

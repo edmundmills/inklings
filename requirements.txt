@@ -1,3 +1,6 @@
 pgvector
+django
 numpy
 sentence-transformers
+openai
+psycopg2-binary

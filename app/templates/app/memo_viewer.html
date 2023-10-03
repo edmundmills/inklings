@@ -16,16 +16,41 @@
             <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
                 <div class="position-sticky">
                     <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMemoModal">Create Memo</a>
-                    <h5 class="fw-semibold mt-3">Memos</h5>
-                    <ul class="nav nav-pills flex-column mb-auto">
-                        {% for memo in memos %}
-                            <li class="nav-item">
-                                <a href="{% url 'view_memo' memo.id %}" class="nav-link{% if memo.id == active_memo_id %} active{% endif %}">
-                                    {{ memo.title }}
-                                </a>
-                            </li>
-                        {% endfor %}
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="tags-tab" data-bs-toggle="pill" href="#tags">Tags</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="memos-tab" data-bs-toggle="pill" href="#memos">Memos</a>
+                        </li>
                     </ul>
+                    
+                    <!-- Pill content -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade" id="memos">
+
+                            <ul class="nav nav-pills flex-column mb-auto">
+                                {% for memo in memos %}
+                                    <li class="nav-item">
+                                        <a href="{% url 'view_memo' memo.id %}" class="nav-link{% if memo.id == active_memo_id %} active{% endif %}">
+                                            {{ memo.title }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade active show" id="tags">
+                            <ul class="nav nav-pills flex-column mb-auto">
+                                {% for tag in tags %}
+                                    <li class="nav-item">
+                                        <a href="{% url 'view_tag' tag.id %}" class="nav-link{% if tag.id == active_tag_id %} active{% endif %}">
+                                            {{ tag.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </nav>
             <!-- Main Content Area -->
@@ -48,7 +73,7 @@
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+                            <input type="text" class="form-control" id="title" name="title">
                         </div>
                         <div class="mb-3">
                             <label for="content" class="form-label">Content</label>

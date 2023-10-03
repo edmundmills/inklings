@@ -14,7 +14,8 @@ class Memo(models.Model):
 class Inkling(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     memo = models.ForeignKey(Memo, on_delete=models.SET_NULL, null=True, blank=True)
-    text = models.TextField()
+    title = models.CharField(max_length=255)
+    content = models.TextField()
     tags = models.ManyToManyField('Tag', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -23,6 +24,8 @@ class Inkling(models.Model):
 class Tag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
+
+    DEFAULT_TAGS = ['Task', 'Idea', 'Social', 'Family', 'Craft', 'Reflection', 'Health', 'Event', 'Work']
 
     def save(self, *args, **kwargs):
         self.name = self.name.lower()

@@ -28,4 +28,6 @@ urlpatterns = [
     path('', views.MemoListView.as_view(), name='home'),
     path('memo/<int:pk>/', views.MemoDetailView.as_view(), name='view_memo'),
     path('create_memo/', views.create_memo, name='create_memo'),
+    path('process_memo/<int:pk>/', views.process_memo, name='process_memo'),
+    path('tag/<int:pk>/', views.TagDetailView.as_view(), name='view_tag'),
 ]
