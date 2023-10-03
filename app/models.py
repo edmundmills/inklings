@@ -7,6 +7,8 @@ class Memo(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     tags = models.ManyToManyField('Tag', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Inkling(models.Model):
@@ -14,6 +16,8 @@ class Inkling(models.Model):
     memo = models.ForeignKey(Memo, on_delete=models.SET_NULL, null=True, blank=True)
     text = models.TextField()
     tags = models.ManyToManyField('Tag', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Tag(models.Model):
@@ -40,3 +44,5 @@ class Link(models.Model):
     source_inkling = models.ForeignKey('Inkling', on_delete=models.CASCADE, related_name='source_links')
     target_inkling = models.ForeignKey('Inkling', on_delete=models.CASCADE, related_name='target_links')
     link_type = models.ForeignKey(LinkType, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
