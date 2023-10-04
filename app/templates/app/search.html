@@ -1,33 +1,28 @@
 {% extends 'inkling_viewer.html' %}
 
 {% block content %}
-<div class="d-flex flex-row">
-    <div class="flex-grow-1">
-        <h1><span class="badge rounded-pill text-bg-info text-large">{{ tag.name }}</span></h1>
-    </div>
-    {% include '_tag_actions.html' with tag=tag %}
-</div>
-
-{% if similar_tags.any %}
-<h3>Similar Tags</h3>
-{% for tag in similar_tags %}
+<h1>Search Results: {{ query }}</h1>
+    
+<h3>Tags</h3>
+{% for tag in tags %}
     {% include "_tag.html" with tag=tag %}
+{% empty %}
+    <p>No tags found.</p>
 {% endfor %}
-{% endif %}
-
 
 <h3>Inklings</h3>
-{% for inkling in tag.inkling_set.all %}
+{% for inkling in inklings %}
     <div class="pb-2">
         {% include "_inkling.html" with inkling=inkling %}
     </div>
+{% empty %}
+    <p>No inklings found.</p>
 {% endfor %}
-
-<h3>Memos</h3>
+<!-- <h3>Memos</h3>
 {% for memo in tag.memo_set.all %}
     <div class="pb-2">
         {% include "_memo_summary.html" with memo=memo %}
     </div>
 {% endfor %}
-
+ -->
 {% endblock %}

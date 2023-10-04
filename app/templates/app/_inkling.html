@@ -1,11 +1,17 @@
 <div class="card">
     <div class="card-body">
-        <a href="{% url 'view_inkling' inkling.id %}" class="list-group-item list-group-item-action">
-            {{ inkling.content }}
-        </a>
+        <div class="d-flex flex-row">
+            <div class="flex-grow-1">
+                <a href="{% url 'view_inkling' inkling.id %}" class="list-group-item list-group-item-action">
+                    {{ inkling.content }}
+                </a>        
+            </div>
+            <div>
+                {% include "_inkling_actions.html" with inkling=inkling %}
+            </div>
+        </div>
     </div>
     <div class="card-footer">
-
         <span>
             {% if inkling.tags.all %}
             {% for tag in inkling.tags.all %}

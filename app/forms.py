@@ -5,6 +5,13 @@ from .helpers import create_tags
 from .models import Inkling, Memo
 
 
+class SearchForm(forms.Form):
+    query = forms.CharField(
+        max_length=255, 
+        widget=forms.TextInput(attrs={'placeholder': 'Search...'})
+    )
+
+
 class CommaSeparatedTagsField(forms.CharField):
     def to_python(self, value):
         if not value:

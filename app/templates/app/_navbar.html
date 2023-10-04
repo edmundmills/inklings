@@ -1,12 +1,12 @@
 <nav class="navbar fixed-top navbar-secondary bg-secondary px-3">
     <a class="navbar-brand" href="#">Inklings</a>
     <div class="d-flex">
-        <a href="#" class="btn btn-primary mr-2" data-bs-toggle="modal" data-bs-target="#createInklingModal">New Inkling</a>
-        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMemoModal">New Memo</a>
+        <a href="#" class="btn btn-primary mx-1" data-bs-toggle="modal" data-bs-target="#createInklingModal">New Inkling</a>
+        <a href="#" class="btn btn-primary mx-1" data-bs-toggle="modal" data-bs-target="#createMemoModal">New Memo</a>
     </div>
 </nav>
 <div class="modal fade" id="createMemoModal" tabindex="-1" aria-labelledby="createMemoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createMemoModalLabel">Create Memo</h5>
@@ -20,8 +20,7 @@
                         <input type="text" class="form-control" id="title" name="title">
                     </div>
                     <div class="mb-3">
-                        <label for="content" class="form-label">Content</label>
-                        <textarea class="form-control" id="content" name="content" required></textarea>
+                        <textarea class="form-control" id="content" rows="12" name="content" required></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -34,7 +33,7 @@
     </div>
 </div>    
 <div class="modal fade" id="createInklingModal" tabindex="-1" aria-labelledby="createInklingModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createInklingModalLabel">Create Inkling</h5>
@@ -44,7 +43,7 @@
                 <form id="createInklingForm" method="post" action="{% url 'create_inkling' %}">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <textarea class="form-control" id="content" name="content" required></textarea>
+                        <textarea class="form-control" id="content" name="content" rows="12" required></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

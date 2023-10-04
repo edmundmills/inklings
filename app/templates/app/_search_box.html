@@ -1,0 +1,7 @@
+{% load bootstrap_filters %}
+
+<div class="p-2">
+    <form method="get" action="{% url 'search' %}">
+        {{ search_form.query|as_bootstrap }}
+    </form>
+</div>
