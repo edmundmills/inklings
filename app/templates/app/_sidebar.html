@@ -1,14 +1,16 @@
 <nav id="sidebar" class="col-3 bg-dark sidebar-dark sidebar h-100" style="overflow-y: auto;">
     <div class="position-sticky">
         {% include '_search_box.html' %}
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a class="nav-link active" id="tags-tab" data-bs-toggle="pill" href="#tags">Tags</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="memos-tab" data-bs-toggle="pill" href="#memos">Memos</a>
-            </li>
-        </ul>
+        <div class=" p-2">
+            <ul class="nav nav-pills nav-pills nav-fill">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tags-tab" data-bs-toggle="pill" href="#tags">Tags</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="memos-tab" data-bs-toggle="pill" href="#memos">Memos</a>
+                </li>
+            </ul>    
+        </div>
         <div class="tab-content">
             <div class="tab-pane fade" id="memos">
 
