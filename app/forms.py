@@ -51,22 +51,15 @@ class MemoForm(forms.ModelForm):
             create_tags(tag_names, instance)
         return instance
 
-class InklingForm(forms.ModelForm):
-    tags = CommaSeparatedTagsField(widget=CommaSeparatedInput(attrs={'class': 'form-control'}), required=False)
 
+class InklingForm(forms.ModelForm):
     class Meta:
         model = Inkling
-        fields = ['content', 'tags']
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3}),
+        }
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if commit:
-            instance.save()
-            instance.tags.clear()
-            print(self.cleaned_data['tags'])
-            tag_names = [name.strip() for name in self.cleaned_data['tags']]
-            create_tags(tag_names, instance)
-        return instance
 
 
 class BaseInklingFormSet(forms.BaseInlineFormSet):
@@ -79,11 +72,8 @@ class BaseInklingFormSet(forms.BaseInlineFormSet):
             if self.can_delete and self._should_delete_form(form):  # type: ignore
                 print('skip')
                 continue
-            
-            # Assuming 'title' and 'content' are fields in your Inkling model
-            content = form.cleaned_data.get('content')
-            tags = form.cleaned_data.get('tags')
 
+            content = form.cleaned_data.get('content')
             if not content:
                 # remove the form from self.forms if it's empty
                 self.forms.remove(form)
@@ -94,6 +84,5 @@ InklingFormset = forms.inlineformset_factory(
     Inkling,
     form=InklingForm,
     formset=BaseInklingFormSet,  # specify the custom formset class here
-    fields=('content', 'tags'), 
-    extra=1
+    fields=('content',),
 )

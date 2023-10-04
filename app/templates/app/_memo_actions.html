@@ -2,6 +2,7 @@
     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
     </button>
     <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="{% url 'process_memo' memo.id %}">Generate Inklings</a></li>
       <li><a class="dropdown-item" href="{% url 'delete_memo' memo.id %}" onclick="return confirm('Are you sure you want to delete this Memo?');">Delete Memo</a></li>
     </ul>
 </div>

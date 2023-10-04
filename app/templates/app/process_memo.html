@@ -5,23 +5,17 @@
 <form method="post" action="">
     {% csrf_token %}
 <div class="container-fluid">
-    <h4>Memo Inklings</h4>
+    <h4>Generated Inklings</h4>
     {% for inkling_form in formset %}
         {{ inkling_form.id }}
         <div class="card bg-light mt-2">
             <div class="card-body">
-                {% for field in inkling_form %}
-                    {% if field.name != "id" and field.name != "memo" %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field|as_bootstrap }}
-                    </div>
-                    {% endif %}
-                {% endfor %}
+                <div class="form-group">
+                    {{ inkling_form.content|as_bootstrap }}
+                </div>
             </div>
         </div>
     {% endfor %}
-    
 </div>
 
 <div class="footer-fixed bg-dark py-3">

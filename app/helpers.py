@@ -12,6 +12,10 @@ def create_tags(tags: List[str], object: models.Model):
         object.tags.add(tag) # type: ignore
 
 
+def get_user_tags(user: User):
+    return [t.name for t in Tag.objects.filter(user=user).order_by('name')]
+
+
 def generate_embedding(text):
     model = SentenceTransformer('paraphrase-albert-small-v2')
     embedding = model.encode([text])[0]

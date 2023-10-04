@@ -8,9 +8,9 @@ from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, UpdateView
 from pgvector.django import CosineDistance
 
-from .ai import create_inklings, get_tags_and_title
+from .ai import create_inklings, get_tags, get_tags_and_title
 from .forms import InklingFormset, MemoForm, TagForm
-from .helpers import create_tags, generate_embedding
+from .helpers import create_tags, generate_embedding, get_user_tags
 from .models import Inkling, Memo, Tag
 
 FILTER_THRESHOLD = 0.7
@@ -98,7 +98,7 @@ def create_memo(request):
     if not content:
         return redirect('home')
     
-    user_tags = [t.name for t in Tag.objects.filter(user=request.user).order_by('name')]
+    user_tags = get_user_tags(request.user)
     ai_content = get_tags_and_title(content, title, user_tags)
     if not title:
         title = ai_content.get('title')
@@ -107,13 +107,6 @@ def create_memo(request):
 
     memo = Memo.objects.create(title=title, content=content, user=request.user)
     create_tags(ai_content['tags'], memo)
-
-    inklings = create_inklings(text=content, title=title, existing_tags=user_tags)
-    for inkling in inklings:
-        inkling_tags = inkling.pop('tags')
-        inkling = Inkling.objects.create(**inkling, user=request.user, memo=memo)
-        create_tags(inkling_tags, inkling)
-
     return redirect('process_memo', memo.id)  # type: ignore
 
 
@@ -125,7 +118,7 @@ def create_inkling(request):
     if not content:
         return redirect('home')
     
-    user_tags = [t.name for t in Tag.objects.filter(user=request.user).order_by('name')]
+    user_tags = get_user_tags(request.user)
     ai_content = get_tags_and_title(content, None, user_tags)
     inkling = Inkling.objects.create(content=content, user=request.user)
     create_tags(ai_content['tags'], inkling)
@@ -154,21 +147,33 @@ def delete_memo(request, pk):
 @login_required
 def process_memo(request, pk):
     memo = get_object_or_404(Memo, id=pk, user=request.user)
-
-    if request.method == 'POST':
+    if len(memo.inkling_set.all()): # type: ignore
+        return redirect('view_memo', memo.id) # type: ignore
+    if request.method == 'GET':
+        ideas = create_inklings(memo.content, memo.title)
+        initial_ideas = [{'content': idea} for idea in ideas]
+        form = MemoForm(instance=memo)
+        formset = InklingFormset(instance=memo, initial=initial_ideas)
+        return render(request, 'process_memo.html', {'form': form, 'formset': formset})
+    elif request.method == 'POST':
         form = MemoForm(request.POST, instance=memo)
         formset = InklingFormset(request.POST, instance=memo)
         if not formset.is_valid():
             print(formset.errors)
-
         if formset.is_valid():
-            formset.save()
-            return redirect('view_memo', memo.id)  # type: ignore
-    else:
-        form = MemoForm(instance=memo)
-        formset = InklingFormset(instance=memo)
+            inklings = formset.save(commit=False)
+            for inkling in inklings:
+                inkling.user = request.user
+                inkling.save()
 
-    return render(request, 'process_memo.html', {'form': form, 'formset': formset})
+            if inklings:
+                user_tags = get_user_tags(request.user)
+                created_tags = get_tags([i.content for i in inklings], user_tags)
+                for tags, inkling in zip(created_tags, inklings):
+                    create_tags(tags, inkling)
+            return redirect('view_memo', memo.id)  # type: ignore
+    return redirect('home')
+    
 
 @login_required
 def search(request):
