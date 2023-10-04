@@ -39,8 +39,10 @@ You also provide an appropriate title, if the existing title is None."""
 
 
 def get_tags(contents: list[str], existing_tags: list[str]) -> list[list[str]]:
-    format_instructions = '{"tags": [["input_1_tag_1", "input_1_tag_2", ...], ["input_2_tag_1", "input_2_tag_2", ...], ...]}'
-    system_prompt = f"""You are a helpful assistant who provides tags, given a list of texts. Create tags that address the intention of each text and its major themes. Strike a good balance between general and specific, creating keywords that will be relevant for other texts, both in the list and in general. Do not simply copy the terms from the text.
+    format_instructions = '{"tags": {"0": ["text_0_tag_1", "text_0_tag_2", ...], "1": ["text_1_tag_1", "text_1_tag_2", ...], ...]}'
+    system_prompt = f"""You are a helpful assistant who provides tags for texts. You are given a list of texts, and you return a dictionary of lists of tags, one list for each text. The key for each list is the index of the text in the provided list.
+
+For each text, Create tags that address the intention of each text and its major themes. Strike a good balance between general and specific, creating keywords that will be relevant for other texts, both in the list and in general. Do not simply copy the terms from the text.
 
 You have a list of existing tags. If an existing tag applies to the text, return it as one of the tags you provide. You may also create additional keywords that highlight aspects of the text that are not covered by the list of existing tags. Here are the existing tags: {existing_tags}
 
@@ -48,9 +50,7 @@ Give 3-7 tags per text. Do not give more than 7 tags for a single text.
 
 Return a list of tags for EACH text, in the same order the texts are provided."""
     out = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=str(contents)).complete()['tags']
-    if not isinstance(out[0], list):
-        out = [out]
-    return out
+    return [out[str(i)] for i in range(len(out))]
 
 
 
