@@ -1,16 +1,14 @@
 {% extends 'base.html' %}
 
 {% block viewer %}
-
-<div class="d-flex flex-row px-0">
+<div class="d-flex flex-row px-0 h-100">
     {% include "_sidebar.html" %}
-    <main class="flex-grow-1 p-3">
+    <div class="flex-grow-1 p-3" style="overflow-y: auto;">
         {% block content %}
         {% endblock %}
-    </main>
+    </div>
     {% if inkling or tag or memo %}
         {% include "_similar_sidebar.html" %}
     {% endif %}
-
 </div>
 {% endblock %}

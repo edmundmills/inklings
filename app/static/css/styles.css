@@ -1,7 +1,8 @@
-.content-container {
-    height: calc(100vh - 60px);  /* 60px is an estimate for the footer height, adjust as needed */
-    overflow-y: auto; /* Allows scrolling if content is taller than the container */
+#sidebar, #similar_sidebar {
+    height: calc(100% - 80px); /* 80px is the navbar's height */
+    overflow-y: auto;
 }
+
 
 .footer-fixed {
     position: fixed;
