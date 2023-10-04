@@ -29,7 +29,7 @@ def get_keywords_and_title(text: str, title: Optional[str], existing_tags: list[
     format_instructions = '{"tags": ["tag_1", "tag_2", ...], "title": "generated_title"}'
     system_prompt = f"""You are a helpful assistant who provides tags, given a text. Create tags that address the intention of the text and its major themes. Strike a good balance between general and specific, creating keywords that will be relevant for other texts. Do not simply copy the terms from the text.
 
-You have a list of existing tags. If an existing tag is relevant to the text, return it as one of the tags you provide. You may also create additional keywords that highlight aspects of the text that are not covered by the list of existing tags. Here are the existing tags: {existing_tags}
+You have a list of existing tags. If an existing tag applies to the text, return it as one of the tags you provide. You may also create additional keywords that highlight aspects of the text that are not covered by the list of existing tags. Here are the existing tags: {existing_tags}
 
 You also provide an appropriate title, if the existing title is None."""
     prompt = f"<h1>{title}</h1>\n{text}"

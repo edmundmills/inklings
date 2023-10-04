@@ -33,6 +33,9 @@ class Tag(models.Model):
 
     class Meta:
         unique_together = ['user', 'name']
+    
+    def __str__(self):
+        return self.name
 
 
 class LinkType(models.Model):

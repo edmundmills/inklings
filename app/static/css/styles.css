@@ -1,0 +1,12 @@
+.content-container {
+    height: calc(100vh - 60px);  /* 60px is an estimate for the footer height, adjust as needed */
+    overflow-y: auto; /* Allows scrolling if content is taller than the container */
+}
+
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+}
