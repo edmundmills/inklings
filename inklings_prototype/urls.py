@@ -25,9 +25,10 @@ urlpatterns = [
     path('accounts/signup/', views.signup_view, name='signup'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('', views.MemoListView.as_view(), name='home'),
+    path('memos', views.MemoListView.as_view(), name='home'),
     path('memo/<int:pk>/', views.MemoDetailView.as_view(), name='view_memo'),
     path('memos/create', views.create_memo, name='create_memo'),
     path('memo/<int:pk>/process/', views.process_memo, name='process_memo'),
     path('tag/<int:pk>/', views.TagDetailView.as_view(), name='view_tag'),
+    path('inkling/<int:pk>/', views.InklingDetailView.as_view(), name='view_inkling'),
 ]

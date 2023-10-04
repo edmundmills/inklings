@@ -1,4 +1,10 @@
 {% extends 'memo_viewer.html' %}
 
 {% block content %}
+<h2>{{ tag.name }}</h2>
+
+{% for inkling in tag.inkling_set.all %}
+    {% include "_inkling.html" with inkling=inkling %}
+{% endfor %}
+
 {% endblock %}

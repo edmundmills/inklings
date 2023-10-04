@@ -44,6 +44,21 @@ class MemoDetailView(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
+class InklingDetailView(DetailView):
+    model = Inkling
+    template_name = 'view_inkling.html'
+
+    def get_queryset(self):
+        return Inkling.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
+        return context
+
+
+
+@method_decorator(login_required, name='dispatch')
 class TagDetailView(DetailView):
     model = Tag
     template_name = 'view_tag.html'
