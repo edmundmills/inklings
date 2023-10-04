@@ -13,7 +13,7 @@ from .forms import InklingFormset, MemoForm
 from .helpers import create_tags, generate_embedding
 from .models import Inkling, Memo, Tag
 
-FILTER_THRESHOLD = 0.7
+FILTER_THRESHOLD = 0.8
 
 @method_decorator(login_required, name='dispatch')
 class MemoListView(ListView):

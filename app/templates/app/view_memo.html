@@ -1,6 +1,16 @@
 {% extends 'inkling_viewer.html' %}
 
 {% block content %}
-{% include "_memo.html" %}
+<div class="mb-2">
+    {% include "_memo.html" %}
+</div>
+
+<h3>Inklings</h3>
+{% for inkling in memo.inkling_set.all %}
+    <div class="pb-2">
+        {% include "_inkling.html" with inkling=inkling %}
+    </div>
+{% endfor %}
+
 
 {% endblock %}
