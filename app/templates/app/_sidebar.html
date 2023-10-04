@@ -14,7 +14,7 @@
             <div class="tab-pane fade" id="memos">
 
                 <ul class="nav nav-pills flex-column mb-auto">
-                    {% for memo in memos %}
+                    {% for memo in all_memos %}
                         <li class="nav-item">
                             <a href="{% url 'view_memo' memo.id %}" class="nav-link{% if memo.id == active_memo_id %} active{% endif %}">
                                 {{ memo.title }}
@@ -25,7 +25,7 @@
             </div>
             <div class="tab-pane fade active show" id="tags">
                 <ul class="nav nav-pills flex-column mb-auto">
-                    {% for tag in tags %}
+                    {% for tag in all_tags %}
                         <li class="nav-item">
                             <a href="{% url 'view_tag' tag.id %}" class="nav-link{% if tag.id == active_tag_id %} active{% endif %}">
                                 {{ tag.name }}

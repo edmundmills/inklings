@@ -1,0 +1,23 @@
+<nav id="sidebar" class="col-4 border border-left sidebar p-2" style="min-height: 100vh;">
+
+    <div class="mb-2">
+        <h3>Similar Tags</h3>
+        {% for similar_tag in similar_tags %}
+            {% include "_tag.html" with tag=similar_tag %}
+        {% endfor %}    
+    </div>
+
+    <h3>Similar Inklings</h3>
+    {% for similar_inkling in similar_inklings %}
+        <div class="pb-2">
+            {% include "_inkling.html" with inkling=similar_inkling %}
+        </div>
+    {% endfor %}
+
+    <h3>Similar Memos</h3>
+    {% for similar_memo in similar_memos %}
+        <div class="pb-2">
+            {% include "_memo_summary.html" with memo=similar_memo %}
+        </div>
+    {% endfor %}
+</nav>

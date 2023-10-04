@@ -8,14 +8,6 @@
     {% include '_tag_actions.html' with tag=tag %}
 </div>
 
-<div class="mb-2">
-    <h3>Similar Tags</h3>
-    {% for tag in similar_tags %}
-        {% include "_tag.html" with tag=tag %}
-    {% endfor %}    
-</div>
-
-
 <h3>Inklings</h3>
 {% for inkling in tag.inkling_set.all %}
     <div class="pb-2">

@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -5,15 +7,15 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView
 from pgvector.django import CosineDistance
 
 from .ai import create_inklings, get_tags, get_tags_and_title
 from .forms import InklingFormset, MemoForm, TagForm
-from .helpers import create_tags, generate_embedding, get_user_tags
-from .models import Inkling, Memo, Tag
+from .helpers import (FILTER_THRESHOLD, create_tags, generate_embedding,
+                      get_all, get_similar, get_user_tags)
+from .models import Inkling, Memo, Tag, User
 
-FILTER_THRESHOLD = 0.7
 
 @method_decorator(login_required, name='dispatch')
 class MemoListView(ListView):
@@ -25,8 +27,7 @@ class MemoListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['memos'] = Memo.objects.filter(user=self.request.user).order_by('-created_at')
-        context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
+        context.update(get_all(self.request.user)) # type: ignore
         return context
 
 
@@ -40,8 +41,8 @@ class MemoDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['memos'] = Memo.objects.filter(user=self.request.user).order_by('-created_at')
-        context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
+        context.update(get_all(self.request.user)) # type: ignore
+        context.update(get_similar(self.object, self.request.user)) # type: ignore
         return context
 
 
@@ -55,10 +56,9 @@ class InklingDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
-        context['similar_inklings'] =  Inkling.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', self.object.embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[1:6] # type: ignore
+        context.update(get_all(self.request.user)) # type: ignore
+        context.update(get_similar(self.object, self.request.user)) # type: ignore
         return context
-
 
 
 @method_decorator(login_required, name='dispatch')
@@ -71,9 +71,8 @@ class TagDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['memos'] = Memo.objects.filter(user=self.request.user).order_by('-created_at')
-        context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
-        context['similar_tags'] =  Tag.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', self.object.embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[1:20] # type: ignore
+        context.update(get_all(self.request.user)) # type: ignore
+        context.update(get_similar(self.object, self.request.user)) # type: ignore
         return context
 
 
@@ -125,6 +124,7 @@ def create_inkling(request):
 
     return redirect('view_inkling', inkling.id)  # type: ignore
 
+
 @login_required
 def delete_inkling(request, pk):
     inkling = get_object_or_404(Inkling, id=pk, user=request.user)
@@ -132,17 +132,20 @@ def delete_inkling(request, pk):
     referer = request.META.get('HTTP_REFERER')
     return redirect(referer) if referer else redirect('/')
 
+
 @login_required
 def delete_tag(request, pk):
     tag = get_object_or_404(Tag, id=pk, user=request.user)
     tag.delete()
     return redirect('/')
 
+
 @login_required
 def delete_memo(request, pk):
     memo = get_object_or_404(Memo, id=pk, user=request.user)
     memo.delete()
     return redirect('/')
+
 
 @login_required
 def process_memo(request, pk):
@@ -183,7 +186,7 @@ def search(request):
     inklings = Inkling.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')
     tags = Tag.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[:MAX_TAGS]
     memos = Memo.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')
-    return render(request, 'search.html', dict(query=query, inklings=inklings, tags=tags, memos=memos))
+    return render(request, 'search.html', dict(query=query, inklings=inklings, tags=tags, memos=memos, **get_all(request.user)))
 
 
 @login_required
