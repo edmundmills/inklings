@@ -143,8 +143,7 @@ def delete_inkling(request, pk):
 def delete_tag(request, pk):
     tag = get_object_or_404(Tag, id=pk, user=request.user)
     tag.delete()
-    referer = request.META.get('HTTP_REFERER')
-    return redirect(referer) if referer else redirect('/')
+    return redirect('/')
 
 @login_required
 def delete_memo(request, pk):

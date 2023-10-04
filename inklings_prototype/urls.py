@@ -31,9 +31,9 @@ urlpatterns = [
     path('memos/create', views.create_memo, name='create_memo'),
     path('memo/<int:pk>/process/', views.process_memo, name='process_memo'),
     path('tag/<int:pk>/', views.TagDetailView.as_view(), name='view_tag'),
-    path('tag/<int:pk>/delete/', views.TagDetailView.as_view(), name='delete_tag'),
+    path('tag/<int:pk>/delete/', views.delete_tag, name='delete_tag'),
     path('inkling/<int:pk>/', views.InklingDetailView.as_view(), name='view_inkling'),
-    path('inkling/<int:pk>/delete/', views.delete_tag, name='delete_inkling'),
+    path('inkling/<int:pk>/delete/', views.delete_inkling, name='delete_inkling'),
     path('inklings/create/', views.create_inkling, name='create_inkling'),
     path('search/', views.search, name='search'),
 ]
