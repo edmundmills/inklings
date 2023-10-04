@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex flex-row">
     <div class="flex-grow-1">
-        <h1><span class="badge rounded-pill text-bg-info text-large">#{{ tag.name }}</span></h1>
+        <h1>#{{ tag.name }}</h1>
     </div>
     {% include '_tag_actions.html' with tag=tag %}
 </div>

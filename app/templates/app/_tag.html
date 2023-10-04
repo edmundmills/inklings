@@ -1,1 +1,3 @@
-<a href="{% url 'view_tag' tag.id %}" class="badge rounded-pill text-bg-info">#{{ tag.name }}</a> 
+<div class="d-inline-block mx-1">
+    <a href="{% url 'view_tag' tag.id %}">#{{ tag.name }}</a>
+</div>
