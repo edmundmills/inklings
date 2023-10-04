@@ -161,8 +161,7 @@ def process_memo(request, pk):
         if not formset.is_valid():
             print(formset.errors)
 
-        if form.is_valid() and formset.is_valid():
-            form.save()
+        if formset.is_valid():
             formset.save()
             return redirect('view_memo', memo.id)  # type: ignore
     else:

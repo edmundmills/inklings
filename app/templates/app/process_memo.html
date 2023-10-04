@@ -11,7 +11,7 @@
         <div class="card bg-light mt-2">
             <div class="card-body">
                 {% for field in inkling_form %}
-                    {% if field.name != "id" and field.name != "memo" and field.name != "title" %}
+                    {% if field.name != "id" and field.name != "memo" %}
                     <div class="form-group">
                         {{ field.label_tag }}
                         {{ field|as_bootstrap }}

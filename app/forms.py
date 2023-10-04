@@ -76,13 +76,10 @@ class BaseInklingFormSet(forms.BaseInlineFormSet):
                 continue
             
             # Assuming 'title' and 'content' are fields in your Inkling model
-            title = form.cleaned_data.get('title')
-            content = form.cleaned_data.get('content')
-            title = form.cleaned_data.get('title')
             content = form.cleaned_data.get('content')
             tags = form.cleaned_data.get('tags')
 
-            if not title and not content and not tags:
+            if not content:
                 # remove the form from self.forms if it's empty
                 self.forms.remove(form)
 
@@ -93,6 +90,5 @@ InklingFormset = forms.inlineformset_factory(
     form=InklingForm,
     formset=BaseInklingFormSet,  # specify the custom formset class here
     fields=('content', 'tags'), 
-    extra=1,
-    can_delete=True
+    extra=1
 )
