@@ -1,10 +1,21 @@
 {% extends 'memo_viewer.html' %}
 
 {% block content %}
-<h2>{{ tag.name }}</h2>
+<h1><span class="badge badge-pill badge-info text-large">{{ tag.name }}</span></h1>
 
+{% if similar_tags.any %}
+<h3>Similar Tags</h3>
+{% for tag in similar_tags %}
+    {% include "_tag.html" with tag=tag %}
+{% endfor %}
+{% endif %}
+
+
+<h3>Inklings</h3>
 {% for inkling in tag.inkling_set.all %}
-    {% include "_inkling.html" with inkling=inkling %}
+    <div class="pb-2">
+        {% include "_inkling.html" with inkling=inkling %}
+    </div>
 {% endfor %}
 
 {% endblock %}

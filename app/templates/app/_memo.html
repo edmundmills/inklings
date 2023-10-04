@@ -1,0 +1,13 @@
+<div class="card">
+    <div class="card-body">
+        <h2>{{ memo.title }}</h2>
+
+        {% if memo.tags.all %}
+            {% for tag in memo.tags.all %}
+                {% include "_tag.html" with tag=tag %}
+            {% endfor %}
+        {% endif %}
+
+        <div>{{ memo.content|linebreaks }}</div>
+    </div>
+</div>

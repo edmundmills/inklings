@@ -2,4 +2,14 @@
 
 {% block content %}
 {% include "_inkling.html" %}
+
+{% if similar_inklings.any %}
+<h3>Similar Inklings</h3>
+{% for inkling in similar_inklings %}
+    <div class="pb-2">
+        {% include "_inkling.html" with inkling=inkling %}
+    </div>
+{% endfor %}
+{% endif %}
+
 {% endblock %}

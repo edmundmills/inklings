@@ -1,11 +1,15 @@
 <div class="card">
     <div class="card-body">
-        <div>{{ inkling.content }}</div>
+        <a href="{% url 'view_inkling' inkling.id %}" class="list-group-item list-group-item-action">
+            {{ inkling.content }}
+        </a>
+    </div>
+    <div class="card-footer">
 
         <span>
             {% if inkling.tags.all %}
             {% for tag in inkling.tags.all %}
-                <a href="{% url 'view_tag' tag.id %}">{{ tag.name }}</a> 
+                {% include "_tag.html" with tag=tag %}
             {% endfor %}
             {% endif %}    
         </span>

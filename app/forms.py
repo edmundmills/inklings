@@ -85,7 +85,7 @@ InklingFormset = forms.inlineformset_factory(
     Inkling,
     form=InklingForm,
     formset=BaseInklingFormSet,  # specify the custom formset class here
-    fields=('title', 'content', 'tags'), 
+    fields=('content', 'tags'), 
     extra=1,
     can_delete=True
 )

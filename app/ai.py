@@ -25,7 +25,7 @@ class Prompt:
         return json.loads(content)
 
 
-def get_keywords_and_title(text: str, title: Optional[str], existing_tags: list[str]) -> dict:
+def get_tags_and_title(text: str, title: Optional[str], existing_tags: list[str]) -> dict:
     format_instructions = '{"tags": ["tag_1", "tag_2", ...], "title": "generated_title"}'
     system_prompt = f"""You are a helpful assistant who provides tags, given a text. Create tags that address the intention of the text and its major themes. Strike a good balance between general and specific, creating keywords that will be relevant for other texts. Do not simply copy the terms from the text.
 
@@ -53,4 +53,4 @@ When expressing the ideas, keep in mind:
 - The ideas do not need to be copied from the text verbatim. Try to give them in the voice of the person who wrote the text.
 - Each idea should be able to stand on its own as an insightful quote or tweet.  Their meaning should be understood without seeing the main text or any of the other ideas."""
     ideas = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=f"<h1>{title}</h1>\n{text}").complete()['ideas']
-    return [{"content": idea, **get_keywords_and_title(idea, title=None, existing_tags=existing_tags)} for idea in ideas]
+    return [{"content": idea, "tags": get_tags_and_title(idea, title=None, existing_tags=existing_tags)['tags']} for idea in ideas]

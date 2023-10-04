@@ -6,8 +6,9 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView, UpdateView
+from pgvector.django import CosineDistance
 
-from .ai import create_inklings, get_keywords_and_title
+from .ai import create_inklings, get_tags_and_title
 from .forms import InklingFormset, MemoForm
 from .helpers import create_tags
 from .models import Inkling, Memo, Tag
@@ -54,6 +55,7 @@ class InklingDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
+        context['similar_inklings'] =  Inkling.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', self.object.embedding)).filter(distance__lt=0.8).order_by('distance')[1:6] # type: ignore
         return context
 
 
@@ -70,6 +72,7 @@ class TagDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['memos'] = Memo.objects.filter(user=self.request.user).order_by('-created_at')
         context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
+        context['similar_tags'] =  Tag.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', self.object.embedding)).filter(distance__lt=0.8).order_by('distance')[1:6] # type: ignore
         return context
 
 
@@ -95,7 +98,7 @@ def create_memo(request):
         return redirect('home')
     
     user_tags = [t.name for t in Tag.objects.filter(user=request.user).order_by('name')]
-    ai_content = get_keywords_and_title(content, title, user_tags)
+    ai_content = get_tags_and_title(content, title, user_tags)
     if not title:
         title = ai_content.get('title')
     if not title:
@@ -111,6 +114,22 @@ def create_memo(request):
         create_tags(inkling_tags, inkling)
 
     return redirect('process_memo', memo.id)  # type: ignore
+
+
+@login_required
+@require_POST
+def create_inkling(request):
+    content = request.POST.get('content')
+
+    if not content:
+        return redirect('home')
+    
+    user_tags = [t.name for t in Tag.objects.filter(user=request.user).order_by('name')]
+    ai_content = get_tags_and_title(content, None, user_tags)
+    inkling = Inkling.objects.create(content=content, user=request.user)
+    create_tags(ai_content['tags'], inkling)
+
+    return redirect('view_inkling', inkling.id)  # type: ignore
 
 
 @login_required

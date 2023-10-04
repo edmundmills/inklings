@@ -1,13 +1,6 @@
 {% extends 'memo_viewer.html' %}
 
 {% block content %}
-<h2>{{ memo.title }}</h2>
+{% include "_memo.html" %}
 
-{% if memo.tags.all %}
-    {% for tag in memo.tags.all %}
-        <a href="{% url 'view_tag' tag.id %}">{{ tag.name }}</a> 
-    {% endfor %}
-{% endif %}
-
-<div>{{ memo.content|linebreaks }}</div>
 {% endblock %}

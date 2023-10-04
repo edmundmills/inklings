@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from pgvector.django import VectorField
 
 
 class Memo(models.Model):
@@ -14,8 +15,8 @@ class Memo(models.Model):
 class Inkling(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     memo = models.ForeignKey(Memo, on_delete=models.SET_NULL, null=True, blank=True)
-    title = models.CharField(max_length=255)
     content = models.TextField()
+    embedding = VectorField(dimensions=768, null=True)
     tags = models.ManyToManyField('Tag', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -24,6 +25,7 @@ class Inkling(models.Model):
 class Tag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
+    embedding = VectorField(dimensions=768, null=True)
 
     DEFAULT_TAGS = ['Task', 'Idea', 'Social', 'Family', 'Craft', 'Reflection', 'Health', 'Event', 'Work']
 
