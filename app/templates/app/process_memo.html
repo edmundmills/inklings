@@ -1,33 +1,30 @@
 {% extends 'base.html' %}
 {% load bootstrap_filters %}
 
-{% block content %}
+{% block viewer %}
 <form method="post" action="">
     {% csrf_token %}
-
-<div class="d-flex">
-    <div class="overflowy-auto">
-        <h4>Memo Inklings</h4>
-        {% for inkling_form in formset %}
-            {{ inkling_form.id }}
-            <div class="card mt-2">
-                <div class="card-body">
-                    {% for field in inkling_form %}
-                        {% if field.name != "id" and field.name != "memo" and field.name != "title" %}
-                        <div class="form-group">
-                            {{ field.label_tag }}
-                            {{ field|as_bootstrap }}
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+<div class="container-fluid">
+    <h4>Memo Inklings</h4>
+    {% for inkling_form in formset %}
+        {{ inkling_form.id }}
+        <div class="card bg-light mt-2">
+            <div class="card-body">
+                {% for field in inkling_form %}
+                    {% if field.name != "id" and field.name != "memo" and field.name != "title" %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field|as_bootstrap }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
+    
 </div>
 
-<!-- Fixed footer at the bottom -->
-<div class="footer-fixed bg-light py-3">
+<div class="footer-fixed bg-dark py-3">
     {{ formset.management_form }}
     <button type="submit" class="btn btn-primary">Save</button>
 </div>

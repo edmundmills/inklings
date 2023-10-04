@@ -8,6 +8,7 @@ class Memo(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     tags = models.ManyToManyField('Tag', blank=True)
+    embedding = VectorField(dimensions=768, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

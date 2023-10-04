@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .helpers import generate_embedding
-from .models import Inkling, Tag
+from .models import Inkling, Memo, Tag
 
 
 @receiver(post_save, sender=User)
@@ -14,6 +14,12 @@ def create_default_keywords(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Inkling)
 def generate_and_save_embedding_for_inkling(sender, instance, **kwargs):
+    if instance.embedding is None:
+        instance.embedding = generate_embedding(instance.content)
+        instance.save(update_fields=['embedding'])
+
+@receiver(post_save, sender=Memo)
+def generate_and_save_embedding_for_memo(sender, instance, **kwargs):
     if instance.embedding is None:
         instance.embedding = generate_embedding(instance.content)
         instance.save(update_fields=['embedding'])

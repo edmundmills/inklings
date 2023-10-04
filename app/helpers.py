@@ -15,5 +15,4 @@ def create_tags(tags: List[str], object: models.Model):
 def generate_embedding(text):
     model = SentenceTransformer('paraphrase-albert-small-v2')
     embedding = model.encode([text])[0]
-    print(embedding)
     return embedding

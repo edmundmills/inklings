@@ -1,7 +1,15 @@
 {% extends 'inkling_viewer.html' %}
 
 {% block content %}
-{% include "_inkling.html" %}
+
+<div class="mb-2">
+    {% include "_inkling.html" %}
+</div>
+
+{% if inkling.memo %}
+<h3>Memos</h3>
+{% include '_memo_summary.html' with memo=inkling.memo %}
+{% endif %}
 
 {% if similar_inklings.any %}
 <h3>Similar Inklings</h3>

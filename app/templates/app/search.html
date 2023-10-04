@@ -2,13 +2,15 @@
 
 {% block content %}
 <h1>Search Results: {{ query }}</h1>
-    
-<h3>Tags</h3>
-{% for tag in tags %}
-    {% include "_tag.html" with tag=tag %}
-{% empty %}
-    <p>No tags found.</p>
-{% endfor %}
+
+<div class="mb-2">
+    <h3>Tags</h3>
+    {% for tag in tags %}
+        {% include "_tag.html" with tag=tag %}
+    {% empty %}
+        <p>No tags found.</p>
+    {% endfor %}    
+</div>
 
 <h3>Inklings</h3>
 {% for inkling in inklings %}
@@ -18,11 +20,14 @@
 {% empty %}
     <p>No inklings found.</p>
 {% endfor %}
-<!-- <h3>Memos</h3>
-{% for memo in tag.memo_set.all %}
+
+<h3>Memos</h3>
+{% for memo in memos %}
     <div class="pb-2">
         {% include "_memo_summary.html" with memo=memo %}
     </div>
+{% empty %}
+    <p>No memos found.</p>
 {% endfor %}
- -->
+
 {% endblock %}

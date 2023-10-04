@@ -13,7 +13,7 @@ from .forms import InklingFormset, MemoForm
 from .helpers import create_tags, generate_embedding
 from .models import Inkling, Memo, Tag
 
-FILTER_THRESHOLD = 0.6
+FILTER_THRESHOLD = 0.7
 
 @method_decorator(login_required, name='dispatch')
 class MemoListView(ListView):
@@ -178,4 +178,5 @@ def search(request):
     embedding = generate_embedding(query)
     inklings = Inkling.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')
     tags = Tag.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[:MAX_TAGS]
-    return render(request, 'search.html', dict(query=query, inklings=inklings, tags=tags))
+    memos = Memo.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')
+    return render(request, 'search.html', dict(query=query, inklings=inklings, tags=tags, memos=memos))
