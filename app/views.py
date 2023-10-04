@@ -105,6 +105,8 @@ def process_memo(request, pk):
     if request.method == 'POST':
         form = MemoForm(request.POST, instance=memo)
         formset = InklingFormset(request.POST, instance=memo)
+        if not formset.is_valid():
+            print(formset.errors)
 
         if form.is_valid() and formset.is_valid():
             form.save()

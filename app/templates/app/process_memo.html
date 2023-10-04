@@ -2,6 +2,8 @@
 {% load bootstrap_filters %}
 
 {% block content %}
+<form method="post" action="">
+    {% csrf_token %}
 
 <div class="content-container d-flex">
     <!-- Memo fields on the left -->

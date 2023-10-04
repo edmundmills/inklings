@@ -35,7 +35,7 @@ class MemoForm(forms.ModelForm):
         if commit:
             instance.save()
             instance.tags.clear()
-            tag_names = [name.strip() for name in self.cleaned_data['tags'].split(',')]
+            tag_names = [name.strip() for name in self.cleaned_data['tags']]
             create_tags(tag_names, instance)
         return instance
 
@@ -44,23 +44,48 @@ class InklingForm(forms.ModelForm):
 
     class Meta:
         model = Inkling
-        fields = ['title', 'content', 'tags']
+        fields = ['content', 'tags']
 
     def save(self, commit=True):
         instance = super().save(commit=False)
         if commit:
             instance.save()
             instance.tags.clear()
-            tag_names = [name.strip() for name in self.cleaned_data['tags'].split(',')]
+            print(self.cleaned_data['tags'])
+            tag_names = [name.strip() for name in self.cleaned_data['tags']]
             create_tags(tag_names, instance)
         return instance
 
 
+class BaseInklingFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        """Check that no two inklings have the same title and content."""
+        super().clean()
+
+        for form in self.forms:
+            # Skip forms marked for deletion
+            if self.can_delete and self._should_delete_form(form):  # type: ignore
+                print('skip')
+                continue
+            
+            # Assuming 'title' and 'content' are fields in your Inkling model
+            title = form.cleaned_data.get('title')
+            content = form.cleaned_data.get('content')
+            title = form.cleaned_data.get('title')
+            content = form.cleaned_data.get('content')
+            tags = form.cleaned_data.get('tags')
+
+            if not title and not content and not tags:
+                # remove the form from self.forms if it's empty
+                self.forms.remove(form)
+
 
 InklingFormset = forms.inlineformset_factory(
     Memo, 
-    Inkling, 
+    Inkling,
     form=InklingForm,
+    formset=BaseInklingFormSet,  # specify the custom formset class here
+    fields=('title', 'content', 'tags'), 
     extra=1,
     can_delete=True
 )

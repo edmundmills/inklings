@@ -31,6 +31,8 @@ def get_keywords_and_title(text: str, title: Optional[str], existing_tags: list[
 
 You have a list of existing tags. If an existing tag applies to the text, return it as one of the tags you provide. You may also create additional keywords that highlight aspects of the text that are not covered by the list of existing tags. Here are the existing tags: {existing_tags}
 
+Give 3-7 tags. Do not give more than 7 tags.
+
 You also provide an appropriate title, if the existing title is None."""
     prompt = f"<h1>{title}</h1>\n{text}"
     return Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=prompt).complete()
