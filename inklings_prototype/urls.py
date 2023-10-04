@@ -32,8 +32,10 @@ urlpatterns = [
     path('memo/<int:pk>/process/', views.process_memo, name='process_memo'),
     path('tag/<int:pk>/', views.TagDetailView.as_view(), name='view_tag'),
     path('tag/<int:pk>/delete/', views.delete_tag, name='delete_tag'),
+    path('tag/<int:pk>/update/', views.update_tag, name='update_tag'),
     path('inkling/<int:pk>/', views.InklingDetailView.as_view(), name='view_inkling'),
     path('inkling/<int:pk>/delete/', views.delete_inkling, name='delete_inkling'),
     path('inklings/create/', views.create_inkling, name='create_inkling'),
     path('search/', views.search, name='search'),
+    path('merge_tags/', views.merge_tags, name='merge_tags')
 ]

@@ -9,11 +9,11 @@ from django.views.generic import DetailView, ListView, UpdateView
 from pgvector.django import CosineDistance
 
 from .ai import create_inklings, get_tags_and_title
-from .forms import InklingFormset, MemoForm
+from .forms import InklingFormset, MemoForm, TagForm
 from .helpers import create_tags, generate_embedding
 from .models import Inkling, Memo, Tag
 
-FILTER_THRESHOLD = 0.8
+FILTER_THRESHOLD = 0.7
 
 @method_decorator(login_required, name='dispatch')
 class MemoListView(ListView):
@@ -73,7 +73,7 @@ class TagDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['memos'] = Memo.objects.filter(user=self.request.user).order_by('-created_at')
         context['tags'] =  Tag.objects.filter(user=self.request.user).order_by('name')
-        context['similar_tags'] =  Tag.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', self.object.embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[1:6] # type: ignore
+        context['similar_tags'] =  Tag.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', self.object.embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[1:20] # type: ignore
         return context
 
 
@@ -179,3 +179,51 @@ def search(request):
     tags = Tag.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[:MAX_TAGS]
     memos = Memo.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')
     return render(request, 'search.html', dict(query=query, inklings=inklings, tags=tags, memos=memos))
+
+
+@login_required
+def update_tag(request, pk):
+    tag = get_object_or_404(Tag, id=pk, user=request.user)
+
+    if request.method == "POST":
+        form = TagForm(request.POST, instance=tag)
+
+        if form.is_valid():
+            form.save()
+            return redirect('view_tag', pk)
+
+    return redirect('home')
+
+
+@login_required
+def merge_tags(request):
+    if request.method != "POST":
+        return redirect('home')
+    
+    current_tag_id = request.POST.get('currentTag')
+    tag_to_merge_id = request.POST.get('tagToMerge')
+    new_name = request.POST.get('newName', '').strip()
+
+    current_tag = get_object_or_404(Tag, id=current_tag_id)
+    tag_to_merge = get_object_or_404(Tag, id=tag_to_merge_id)
+
+    # Update Memo objects
+    memos_with_merge_tag = Memo.objects.filter(tags=tag_to_merge)
+    for memo in memos_with_merge_tag:
+        memo.tags.remove(tag_to_merge)
+        memo.tags.add(current_tag, through_defaults={})
+
+    # Update Inkling objects
+    inklings_with_merge_tag = Inkling.objects.filter(tags=tag_to_merge)
+    for inkling in inklings_with_merge_tag:
+        inkling.tags.remove(tag_to_merge)
+        inkling.tags.add(current_tag, through_defaults={})
+
+    tag_to_merge.delete()
+
+    if new_name:
+        current_tag.name = new_name
+        current_tag.embedding = generate_embedding(new_name)
+        current_tag.save()
+
+    return redirect('view_tag', current_tag.id)  # type: ignore

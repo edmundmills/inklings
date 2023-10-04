@@ -2,7 +2,7 @@ from django import forms
 from django.db.models import QuerySet
 
 from .helpers import create_tags
-from .models import Inkling, Memo
+from .models import Inkling, Memo, Tag
 
 
 class SearchForm(forms.Form):
@@ -28,6 +28,11 @@ class CommaSeparatedTagsField(forms.CharField):
 class CommaSeparatedInput(forms.TextInput):
     template_name = 'forms/input_comma_separated.html'
 
+
+class TagForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = ['name']
 
 
 class MemoForm(forms.ModelForm):
