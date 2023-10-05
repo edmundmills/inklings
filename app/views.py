@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView
 from pgvector.django import CosineDistance
 
 from .ai import create_inklings, get_tags, get_tags_and_title
@@ -88,25 +88,33 @@ def signup_view(request):
     return render(request, 'signup.html', {'form': form})
 
 
-@login_required
-@require_POST
-def create_memo(request):
-    title = request.POST.get('title')
-    content = request.POST.get('content')
+@method_decorator(login_required, name='dispatch')
+class MemoCreateView(CreateView):
+    model = Memo
+    form_class = MemoForm  # You'll need to create a form for the Memo model
+    template_name = 'new_memo.html'  # Path to the template you're using
 
-    if not content:
-        return redirect('home')
-    
-    user_tags = get_user_tags(request.user)
-    ai_content = get_tags_and_title(content, title, user_tags)
-    if not title:
-        title = ai_content.get('title')
-    if not title:
-        return redirect('home')
+    def form_valid(self, form):
+        self.object = form.save(commit=False)  # Get the object but don't save to the database yet
 
-    memo = Memo.objects.create(title=title, content=content, user=request.user)
-    create_tags(ai_content['tags'], memo)
-    return redirect('process_memo', memo.id)  # type: ignore
+        content = self.object.content
+        title = self.object.title
+
+        user_tags = get_user_tags(self.request.user) # type: ignore
+        ai_content = get_tags_and_title(content, title, user_tags)
+        
+        if not title:
+            title = ai_content.get('title')
+        if not title:
+            return redirect('home')
+
+        self.object.title = title
+        self.object.user = self.request.user
+        self.object.save()  # Save to the database
+
+        create_tags(ai_content['tags'], self.object)
+
+        return redirect('process_memo', self.object.id)
 
 
 @login_required
