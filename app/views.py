@@ -153,22 +153,26 @@ def delete_inkling(request, pk):
 @login_required
 def delete_tag(request, pk):
     tag = get_object_or_404(Tag, id=pk, user=request.user)
+    embedding = tag.embedding
     tag.delete()
-    return redirect('/')
+    similar_tag = Tag.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).order_by('distance')[0]
+    return redirect('view_tag', similar_tag.pk)
 
 
 @login_required
 def delete_memo(request, pk):
     memo = get_object_or_404(Memo, id=pk, user=request.user)
+    embedding = memo.embedding
     memo.delete()
-    return redirect('/')
+    similar_memo = Memo.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).order_by('distance')[0]
+    return redirect('view_memo', similar_memo.pk)
 
 
 @login_required
 def process_memo(request, pk):
     memo = get_object_or_404(Memo, id=pk, user=request.user)
     if len(memo.inkling_set.all()): # type: ignore
-        return redirect('view_memo', memo.id) # type: ignore
+        return redirect('view_memo', memo.pk)
     if request.method == 'GET':
         ideas = create_inklings(memo.content, memo.title)
         initial_ideas = [{'content': idea} for idea in ideas]
