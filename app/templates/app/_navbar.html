@@ -1,3 +1,10 @@
 <nav class="navbar fixed-top navbar-light bg-light px-3">
     <a class="navbar-brand" href="{% url 'home' %}">Inklings</a>
+    <nav>
+        {% if user.is_authenticated %}
+            {% include '_user_actions.html' %}
+        {% else %}
+            <a class="btn btn-primary" href="{% url 'login'%}">Sign In</a>
+        {% endif %}
+    </nav>
 </nav>

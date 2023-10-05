@@ -3,6 +3,7 @@
 {% block title %}Inkling - Login{% endblock %}
 
 {% block viewer %}
+<div class="p-5">
     <h2>Login</h2>
     <form method="post">
         {% csrf_token %}
@@ -10,4 +11,5 @@
         <button type="submit" class="btn btn-primary">Login</button>
     </form>
     <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+</div>
 {% endblock %}
