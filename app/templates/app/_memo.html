@@ -1,3 +1,5 @@
+{% load martortags %}
+
 <div class="card border-success">
     <div class="card-body">
         <div class="d-flex flex-row">
@@ -13,6 +15,6 @@
             {% endfor %}
         {% endif %}
 
-        <div>{{ memo.content|linebreaks }}</div>
+        <div>{{ memo.content|safe_markdown }}</div>
     </div>
 </div>

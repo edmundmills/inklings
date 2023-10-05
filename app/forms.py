@@ -1,7 +1,6 @@
 from django import forms
-from django.db.models import QuerySet
+from martor.fields import MartorFormField
 
-from .helpers import create_tags
 from .models import Inkling, Memo, Tag
 
 
@@ -19,10 +18,12 @@ class TagForm(forms.ModelForm):
 
 
 class MemoForm(forms.ModelForm):
+    content = MartorFormField()
+
     class Meta:
         model = Memo
         fields = ['title', 'content']
-    
+
 
 class InklingForm(forms.ModelForm):
     class Meta:

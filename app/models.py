@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
+from martor.models import MartorField
 from pgvector.django import VectorField
 
 
 class Memo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    content = models.TextField()
+    content = MartorField()
     tags = models.ManyToManyField('Tag', blank=True)
     embedding = VectorField(dimensions=768, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

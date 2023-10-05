@@ -1,13 +1,12 @@
-from typing import Optional, Union
-
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import (CreateView, DetailView, ListView, UpdateView,
+                                  View)
 from pgvector.django import CosineDistance
 
 from .ai import create_inklings, get_tags, get_tags_and_title
@@ -89,32 +88,42 @@ def signup_view(request):
 
 
 @method_decorator(login_required, name='dispatch')
-class MemoCreateView(CreateView):
+class MemoCreateAndRedirectToEditView(View):
+    def get(self, request, *args, **kwargs):
+        memo = Memo.objects.create(title='Untitled', content='', user=request.user)
+        return redirect(reverse('edit_memo', args=[memo.id])) # type: ignore
+
+
+@method_decorator(login_required, name='dispatch')
+class MemoEditView(UpdateView):
     model = Memo
-    form_class = MemoForm  # You'll need to create a form for the Memo model
-    template_name = 'new_memo.html'  # Path to the template you're using
+    fields = ['title', 'content']
+    template_name = 'edit_memo.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(get_all(self.request.user)) # type: ignore
+        context.update(get_similar(self.object, self.request.user)) # type: ignore
+        return context
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)  # Get the object but don't save to the database yet
+        print('test')
+        memo = form.save(commit=False)
+        memo.embedding = generate_embedding(memo.content)
+        title = None if memo.title == "Untitled" else memo.title
+        if not title or not memo.tags:
+            user_tags = get_user_tags(self.request.user) # type: ignore
+            ai_content = get_tags_and_title(memo.content, title, user_tags)
+            create_tags(ai_content['tags'], memo)
 
-        content = self.object.content
-        title = self.object.title
+            if not title:
+                title = ai_content.get('title')
+            if title:
+                memo.title = title
 
-        user_tags = get_user_tags(self.request.user) # type: ignore
-        ai_content = get_tags_and_title(content, title, user_tags)
-        
-        if not title:
-            title = ai_content.get('title')
-        if not title:
-            return redirect('home')
+        memo.save()  # Save to the database
+        return redirect('view_memo', memo.id)
 
-        self.object.title = title
-        self.object.user = self.request.user
-        self.object.save()  # Save to the database
-
-        create_tags(ai_content['tags'], self.object)
-
-        return redirect('process_memo', self.object.id)
 
 
 @login_required

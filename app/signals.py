@@ -21,7 +21,7 @@ def generate_and_save_embedding_for_inkling(sender, instance, **kwargs):
 @receiver(post_save, sender=Memo)
 def generate_and_save_embedding_for_memo(sender, instance, **kwargs):
     if instance.embedding is None:
-        instance.embedding = generate_embedding(instance.content)
+        instance.embedding = generate_embedding(f'{instance.title}: {instance.content}')
         instance.save(update_fields=['embedding'])
 
 @receiver(post_save, sender=Tag)

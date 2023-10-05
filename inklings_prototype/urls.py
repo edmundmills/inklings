@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import include, path
 
 from app import views
 
@@ -28,8 +28,8 @@ urlpatterns = [
     path('', views.MemoListView.as_view(), name='home'),
     path('memo/<int:pk>/', views.MemoDetailView.as_view(), name='view_memo'),
     path('memo/<int:pk>/delete/', views.delete_memo, name='delete_memo'),
-    path('memos/new/', views.MemoCreateView.as_view(), name='new_memo'),
-    path('memos/create/', views.MemoCreateView.as_view(), name='create_memo'),
+    path('memo/<int:pk>/edit/', views.MemoEditView.as_view(), name='edit_memo'),
+    path('memos/new/', views.MemoCreateAndRedirectToEditView.as_view(), name='new_memo'),
     path('memo/<int:pk>/process/', views.process_memo, name='process_memo'),
     path('tag/<int:pk>/', views.TagDetailView.as_view(), name='view_tag'),
     path('tag/<int:pk>/delete/', views.delete_tag, name='delete_tag'),
@@ -38,5 +38,6 @@ urlpatterns = [
     path('inkling/<int:pk>/delete/', views.delete_inkling, name='delete_inkling'),
     path('inklings/create/', views.create_inkling, name='create_inkling'),
     path('search/', views.search, name='search'),
-    path('merge_tags/', views.merge_tags, name='merge_tags')
+    path('merge_tags/', views.merge_tags, name='merge_tags'),
+    path('martor/', include('martor.urls')),
 ]

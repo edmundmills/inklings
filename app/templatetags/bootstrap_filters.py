@@ -11,3 +11,4 @@ def as_bootstrap(field: BoundField) -> BoundField:
     # Add the Bootstrap class to the widget of the form field
     field.field.widget.attrs.update({'class': 'form-control'})
     return field
+
