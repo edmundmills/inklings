@@ -19,8 +19,8 @@ class Prompt:
     def messages(self) -> list[dict]:
         return [{"role": "system", "content": self.full_system_prompt}, {"role": "user", "content": self.user_prompt}]
 
-    def complete(self, temperature: float = 0) -> dict:
-        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=self.messages, temperature=temperature)
+    def complete(self, temperature: float = 0, model: str = "gpt-3.5-turbo") -> dict:
+        completion = openai.ChatCompletion.create(model=model, messages=self.messages, temperature=temperature)
         content = completion.choices[0].message.content # type: ignore
         return json.loads(content)
 
@@ -68,5 +68,5 @@ When expressing the ideas, keep in mind:
 - Each may be a single sentence to a short paragraph.
 - The ideas do not need to be copied from the text verbatim. Try to give them in the voice of the person who wrote the text.
 - Each idea should be able to stand on its own as an insightful quote or tweet.  Their meaning should be understood without seeing the main text or any of the other ideas."""
-    out = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=f"<h1>{title}</h1>\n{text}").complete()['ideas']
+    out = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=f"<h1>{title}</h1>\n{text}").complete(model='gpt-4', temperature=0.7)['ideas']
     return out
