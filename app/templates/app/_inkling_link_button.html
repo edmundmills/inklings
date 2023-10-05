@@ -1,0 +1,40 @@
+<button class="btn" data-bs-toggle="modal" data-bs-target="#linkToModal{{inkling.pk}}">
+<i class="bi bi-node-plus-fill"></i>
+</button>
+<div class="modal fade" id="linkToModal{{inkling.pk}}" tabindex="-1" aria-labelledby="linkModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="linkModalLabel">Link Inklings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <form action="{% url 'create_link' %}" method="post">
+    <div class="modal-body">
+        {% csrf_token %}
+        <input type="hidden" name="source_inkling_id" value="{{ current_inkling.pk }}">
+        <input type="hidden" name="target_inkling_id" value="{{ inkling.pk }}">              
+        <!-- Show the two inklings -->
+        <div class="card card-body">
+            {{ current_inkling.content }}
+        </div>
+        <div>
+            <select id="linkType" name="linkType" class="form-control">
+            {% for link_type in link_types %}
+            <option value="{{ link_type.pk }}">{{ link_type.name }}</option>
+            <option value="{{ link_type.pk }}_reverse">{{ link_type.reverse_name }}</option>
+            {% endfor %}
+        </select>
+        </div>
+        <div class="card card-body">
+            {{ inkling.content }}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Create Link</button>
+    </div>
+</form>
+    </div>
+</div>
+</div>      

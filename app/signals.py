@@ -11,8 +11,8 @@ def create_default_keywords(sender, instance, created, **kwargs):
     if created:
         for tag_name in Tag.DEFAULT_TAGS:
             Tag.objects.create(name=tag_name, user=instance)
-        for link_type in LinkType.DEFAULT_LINK_TYPES:
-            LinkType.objects.create(name=link_type, user=instance)
+        for forward_name, reverse_name in LinkType.DEFAULT_LINK_TYPES:
+            LinkType.objects.create(name=forward_name, reverse_name=reverse_name, user=instance)
 
 @receiver(post_save, sender=Inkling)
 def generate_and_save_embedding_for_inkling(sender, instance, **kwargs):

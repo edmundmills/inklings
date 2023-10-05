@@ -10,7 +10,7 @@
     <h3>Similar Inklings</h3>
     {% for similar_inkling in similar_inklings %}
         <div class="pb-2">
-            {% include "_inkling.html" with inkling=similar_inkling %}
+            {% include "_inkling.html" with inkling=similar_inkling current_inkling=inkling %}
         </div>
     {% endfor %}
 

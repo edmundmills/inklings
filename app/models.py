@@ -45,7 +45,8 @@ class Tag(models.Model):
 class LinkType(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    DEFAULT_LINK_TYPES = ['Supporting Evidence', 'Counterargument', 'Elaboration', 'Inspiration', 'Next Step', 'Related Question', 'Summary']
+    reverse_name = models.CharField(max_length=255, default='')
+    DEFAULT_LINK_TYPES = [('Supporting', 'Supported by'), ('Counterargument against', 'Countered by'), ('Elaboration for', 'Elaborated by'), ('Inspiration for', 'Inspired by'), ('Next Step', 'Previous Step'),('Related Question', 'Question about'), ('Summary for', 'Summarized by')]
 
     class Meta:
         unique_together = ['user', 'name']
@@ -57,3 +58,6 @@ class Link(models.Model):
     link_type = models.ForeignKey(LinkType, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['source_inkling', 'target_inkling', 'link_type']

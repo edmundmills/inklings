@@ -13,8 +13,42 @@ from .ai import create_inklings, get_tags, get_tags_and_title
 from .forms import InklingFormset, MemoForm, TagForm
 from .helpers import (FILTER_THRESHOLD, create_tags, generate_embedding,
                       get_all, get_similar, get_user_tags)
-from .models import Inkling, Memo, Tag, User
+from .models import Inkling, Link, LinkType, Memo, Tag, User
 
+
+def common_context(request, object = None) -> dict:
+    context = dict()
+    context.update(get_all(request.user)) # type: ignore
+    if object is not None:
+        context.update(get_similar(object, request.user)) # type: ignore
+    context['link_types'] = LinkType.objects.filter(user=request.user)
+    return context
+
+
+def get_link_groups(inkling) -> dict[LinkType, list[Link]]:
+        # Query for links where the current inkling is the source
+    current_to_selected_links = Link.objects.filter(source_inkling=inkling)
+    current_to_selected_links = current_to_selected_links.select_related('link_type').order_by('link_type__name')
+
+    # Query for links where the current inkling is the target
+    selected_to_current_links = Link.objects.filter(target_inkling=inkling)
+    selected_to_current_links = selected_to_current_links.select_related('link_type').order_by('link_type__name')
+
+    # Create a dictionary to group links by LinkType
+    link_groups = {}
+    
+    for link in current_to_selected_links:
+        link_type = link.link_type.name
+        if link_type not in link_groups:
+            link_groups[link_type] = []
+        link_groups[link_type].append(link.target_inkling)  # type: ignore
+    
+    for link in selected_to_current_links:
+        link_type = link.link_type.reverse_name
+        if link_type not in link_groups:
+            link_groups[link_type] = []
+        link_groups[link_type].append(link.source_inkling)  # type: ignore
+    return link_groups
 
 @method_decorator(login_required, name='dispatch')
 class MemoListView(ListView):
@@ -30,10 +64,9 @@ class MemoListView(ListView):
             return redirect('view_memo', memos[0].pk)
         return super().dispatch(request, *args, **kwargs)
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(get_all(self.request.user)) # type: ignore
+        context.update(common_context(self.request))
         return context
 
 
@@ -47,8 +80,7 @@ class MemoDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(get_all(self.request.user)) # type: ignore
-        context.update(get_similar(self.object, self.request.user)) # type: ignore
+        context.update(common_context(self.request, self.object)) # type: ignore
         return context
 
 
@@ -62,8 +94,8 @@ class InklingDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(get_all(self.request.user)) # type: ignore
-        context.update(get_similar(self.object, self.request.user)) # type: ignore
+        context.update(common_context(self.request, self.object)) # type: ignore
+        context['link_groups'] = get_link_groups(self.object) # type: ignore
         return context
 
 
@@ -77,8 +109,7 @@ class TagDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(get_all(self.request.user)) # type: ignore
-        context.update(get_similar(self.object, self.request.user)) # type: ignore
+        context.update(common_context(self.request, self.object)) # type: ignore
         return context
 
 
@@ -109,8 +140,7 @@ class MemoEditView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(get_all(self.request.user)) # type: ignore
-        context.update(get_similar(self.object, self.request.user)) # type: ignore
+        context.update(common_context(self.request, self.object)) # type: ignore
         return context
 
     def form_valid(self, form):
@@ -262,3 +292,39 @@ def merge_tags(request):
         current_tag.save()
 
     return redirect('view_tag', current_tag.id)  # type: ignore
+
+
+@login_required
+def create_link(request):
+    if request.method != 'POST':
+        return redirect(request.META['HTTP_REFERER'])
+    source_inkling_id = request.POST.get('source_inkling_id')
+    target_inkling_id = request.POST.get('target_inkling_id')
+    link_type_id: str = request.POST.get('linkType')
+    if link_type_id.endswith('_reverse'):
+        source_inkling_id, target_inkling_id = target_inkling_id, source_inkling_id
+        link_type_id = link_type_id.removesuffix('_reverse')
+    link_type = LinkType.objects.get(pk=link_type_id)
+    link = Link(
+        source_inkling_id=source_inkling_id,
+        target_inkling_id=target_inkling_id,
+        link_type=link_type,
+    )
+    link.save()
+    # messages.success(request, "Link created successfully!")
+    return redirect(request.META['HTTP_REFERER'])
+
+
+@login_required
+def create_link_type(request):
+    if request.method != 'POST':
+        redirect(request.META['HTTP_REFERER'])
+    name = request.POST.get('name')
+    reverse_name = request.POST.get('reverse_name')
+    link_type = LinkType(
+        name=name,
+        reverse_name=reverse_name,
+        user=request.user
+    )
+    link_type.save()
+    return redirect(request.META['HTTP_REFERER'])

@@ -6,11 +6,9 @@
     {% include "_inkling.html" %}
 </div>
 
-<div class="mb-2">
-    {% if inkling.memo %}
-    <h3>Memos</h3>
-    {% include '_memo_summary.html' with memo=inkling.memo %}
-    {% endif %}    
-</div>
+{% for link_type_name, inklings in link_groups.items %}
+    <h4>{{ link_type_name }}</h4>
+    {% include '_inkling_list_group.html' with inklings=inklings %}
+{% endfor %}
 
 {% endblock %}

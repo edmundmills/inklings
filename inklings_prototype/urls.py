@@ -37,6 +37,8 @@ urlpatterns = [
     path('inkling/<int:pk>/', views.InklingDetailView.as_view(), name='view_inkling'),
     path('inkling/<int:pk>/delete/', views.delete_inkling, name='delete_inkling'),
     path('inklings/create/', views.create_inkling, name='create_inkling'),
+    path('create_link/', views.create_link, name='create_link'),
+    path('create_link_type/', views.create_link_type, name='create_link_type'),
     path('search/', views.search, name='search'),
     path('merge_tags/', views.merge_tags, name='merge_tags'),
     path('martor/', include('martor.urls')),
