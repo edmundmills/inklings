@@ -24,7 +24,6 @@ def get_similar_to_memo(memo: Memo, user: User) -> dict:
     context['similar_inklings'] = (Inkling.objects.filter(user=user)
                                   .alias(distance=CosineDistance('embedding', embedding))
                                   .filter(distance__lt=FILTER_THRESHOLD)
-                                  .exclude(memo=memo)
                                   .order_by('distance')[:5])
 
     context['similar_tags'] = (Tag.objects.filter(user=user)

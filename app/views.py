@@ -107,11 +107,10 @@ class MemoEditView(UpdateView):
         return context
 
     def form_valid(self, form):
-        print('test')
         memo = form.save(commit=False)
         memo.embedding = generate_embedding(memo.content)
         title = None if memo.title == "Untitled" else memo.title
-        if not title or not memo.tags:
+        if (not title) or (not memo.tags.exists()):
             user_tags = get_user_tags(self.request.user) # type: ignore
             ai_content = get_tags_and_title(memo.content, title, user_tags)
             create_tags(ai_content['tags'], memo)

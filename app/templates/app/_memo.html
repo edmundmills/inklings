@@ -17,4 +17,8 @@
 
         <div>{{ memo.content|safe_markdown }}</div>
     </div>
+    <div class="p-2">
+        <h4>Inklings</h4>
+        {% include "_inkling_list_group.html" with inklings=memo.inkling_set.all %}
+    </div>
 </div>
