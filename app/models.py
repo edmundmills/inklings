@@ -45,6 +45,7 @@ class Tag(models.Model):
 class LinkType(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    DEFAULT_LINK_TYPES = ['Supporting Evidence', 'Counterargument', 'Elaboration', 'Inspiration', 'Next Step', 'Related Question', 'Summary']
 
     class Meta:
         unique_together = ['user', 'name']
