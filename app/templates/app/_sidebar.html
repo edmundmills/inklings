@@ -4,31 +4,31 @@
         <div class=" p-2">
             <ul class="nav nav-pills nav-pills nav-fill">
                 <li class="nav-item">
-                    <a class="nav-link active" id="memos-tab" data-bs-toggle="pill" href="#memos">Memos</a>
+                    <a class="nav-link {% if not tag %} active{% endif %}" id="memos-tab" data-bs-toggle="pill" href="#memos">Memos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="tags-tab" data-bs-toggle="pill" href="#tags">Tags</a>
+                    <a class="nav-link {% if tag %} active {% endif %}" id="tags-tab" data-bs-toggle="pill" href="#tags">Tags</a>
                 </li>
             </ul>    
         </div>
-        <div class="tab-content">
-            <div class="tab-pane fade active show" id="memos">
+        <div class="tab-content p-2">
+            <div class="tab-pane fade {% if not tag %} active show {% endif %}" id="memos">
                 <ul class="nav nav-pills flex-column mb-auto">
-                    {% for memo in all_memos %}
+                    {% for a_memo in all_memos %}
                         <li class="nav-item">
-                            <a href="{% url 'view_memo' memo.id %}" class="nav-link{% if memo.id == active_memo_id %} active{% endif %}">
-                                {{ memo.title }}
+                            <a href="{% url 'view_memo' a_memo.id %}" class="nav-link{% if a_memo.id == memo.id %} active{% endif %}">
+                                {{ a_memo.title }}
                             </a>
                         </li>
                     {% endfor %}
                 </ul>
             </div>
-            <div class="tab-pane fade" id="tags">
+            <div class="tab-pane fade {% if tag %} active show {% endif %}" id="tags">
                 <ul class="nav nav-pills flex-column mb-auto">
-                    {% for tag in all_tags %}
+                    {% for a_tag in all_tags %}
                         <li class="nav-item">
-                            <a href="{% url 'view_tag' tag.id %}" class="nav-link{% if tag.id == active_tag_id %} active{% endif %}">
-                                {{ tag.name }}
+                            <a href="{% url 'view_tag' a_tag.id %}" class="nav-link{% if tag.id == a_tag.id %} active{% endif %}">
+                                {{ a_tag.name }}
                             </a>
                         </li>
                     {% endfor %}

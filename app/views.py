@@ -24,6 +24,13 @@ class MemoListView(ListView):
     def get_queryset(self):
         return Memo.objects.filter(user=self.request.user).order_by('-created_at')
 
+    def dispatch(self, request, *args, **kwargs):
+        memos = Memo.objects.filter(user=self.request.user).order_by('-updated_at') 
+        if memos.exists():
+            return redirect('view_memo', memos[0].pk)
+        return super().dispatch(request, *args, **kwargs)
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(get_all(self.request.user)) # type: ignore
