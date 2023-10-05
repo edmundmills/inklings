@@ -351,7 +351,7 @@ def edit_link_type(request, pk):
         form = LinkTypeForm(request.POST, instance=link_type)  # Use your LinkType form if available
         if form.is_valid():
             form.save()
-            return redirect('link_types_list')  # Redirect to the list of link types or another appropriate page
+            return redirect('link_types')  # Redirect to the list of link types or another appropriate page
     else:
         form = LinkTypeForm(instance=link_type)  # Use your LinkType form if available
 
@@ -361,4 +361,4 @@ def edit_link_type(request, pk):
 def delete_link_type(request, pk):
     link_type = get_object_or_404(LinkType, pk=pk)
     link_type.delete()
-    return redirect('link_types_list')  # Redirect to the list of link types or another appropriate page
+    return redirect('link_types')  # Redirect to the list of link types or another appropriate page
