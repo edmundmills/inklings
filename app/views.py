@@ -10,7 +10,7 @@ from django.views.generic import (CreateView, DetailView, ListView, UpdateView,
 from pgvector.django import CosineDistance
 
 from .ai import create_inklings, get_tags, get_tags_and_title
-from .forms import InklingFormset, MemoForm, TagForm
+from .forms import InklingFormset, LinkTypeForm, MemoForm, TagForm
 from .helpers import (FILTER_THRESHOLD, create_tags, generate_embedding,
                       get_all, get_similar, get_user_tags)
 from .models import Inkling, Link, LinkType, Memo, Tag, User
@@ -328,3 +328,37 @@ def create_link_type(request):
     )
     link_type.save()
     return redirect(request.META['HTTP_REFERER'])
+
+
+@method_decorator(login_required, name='dispatch')
+class LinkTypeListView(ListView):
+    model = LinkType
+    template_name = 'link_type_list.html'
+    
+    def get_queryset(self):
+        return LinkType.objects.filter(user=self.request.user).order_by('name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(common_context(self.request))
+        return context
+
+@login_required
+@require_POST
+def edit_link_type(request, pk):
+    link_type = get_object_or_404(LinkType, pk=pk)
+    if request.method == 'POST':
+        form = LinkTypeForm(request.POST, instance=link_type)  # Use your LinkType form if available
+        if form.is_valid():
+            form.save()
+            return redirect('link_types_list')  # Redirect to the list of link types or another appropriate page
+    else:
+        form = LinkTypeForm(instance=link_type)  # Use your LinkType form if available
+
+    return render(request, 'edit_link_type.html', {'form': form, 'link_type': link_type})
+
+@login_required
+def delete_link_type(request, pk):
+    link_type = get_object_or_404(LinkType, pk=pk)
+    link_type.delete()
+    return redirect('link_types_list')  # Redirect to the list of link types or another appropriate page

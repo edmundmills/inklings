@@ -41,5 +41,8 @@ urlpatterns = [
     path('create_link_type/', views.create_link_type, name='create_link_type'),
     path('search/', views.search, name='search'),
     path('merge_tags/', views.merge_tags, name='merge_tags'),
+    path('link_types/', views.LinkTypeListView.as_view(), name='link_types_list'),
+    path('link_type/<int:pk>/edit/', views.edit_link_type, name='edit_link_type'),
+    path('link_type/<int:pk>/delete/', views.delete_link_type, name='delete_link_type'),
     path('martor/', include('martor.urls')),
 ]

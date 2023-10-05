@@ -1,7 +1,7 @@
 from django import forms
 from martor.fields import MartorFormField
 
-from .models import Inkling, Memo, Tag
+from .models import Inkling, LinkType, Memo, Tag
 
 
 class SearchForm(forms.Form):
@@ -23,6 +23,12 @@ class MemoForm(forms.ModelForm):
     class Meta:
         model = Memo
         fields = ['title', 'content']
+
+
+class LinkTypeForm(forms.ModelForm):
+    class Meta:
+        model = LinkType
+        fields = ['name', 'reverse_name']
 
 
 class InklingForm(forms.ModelForm):
