@@ -1,0 +1,11 @@
+$theme-colors: (
+    "primary": #111111
+);
+
+// Import Bootstrap
+@import "~bootstrap/scss/bootstrap";
+
+// Additional custom styles
+body {
+    font-family: 'Your Custom Font', sans-serif;
+}
