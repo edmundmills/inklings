@@ -24,13 +24,3 @@ h1, h2, h3, h4, h5, h6, .btn, .navbar {
     font-family: 'Raleway', sans-serif;
     color: $dark;
 }
-
-.nav-link {
-    &.active {
-        background-color: $primary !important;
-    }
-}
-
-.bg-white {
-    background-color: $white !important;
-}
