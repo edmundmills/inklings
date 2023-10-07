@@ -7,5 +7,9 @@ $theme-colors: (
 
 // Additional custom styles
 body {
-    font-family: 'Your Custom Font', sans-serif;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+h1, h2, h3, h4, h5, h6, .btn, .navbar {
+    font-family: 'Raleway', sans-serif;
 }
