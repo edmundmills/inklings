@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block viewer %}
-<div class="d-flex flex-row px-0 h-100">
+<div class="d-flex flex-row px-0 h-100 bg-light">
     {% include "_sidebar_action.html" %}
     {% include "_sidebar.html" %}
-    <div class="flex-grow-1 p-3" style="overflow-y: auto;">
+    <div class="flex-grow-1 p-2" style="overflow-y: auto;">
         {% block content %}
         {% endblock %}
     </div>

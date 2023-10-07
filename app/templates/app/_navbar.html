@@ -1,5 +1,5 @@
-<nav class="navbar fixed-top navbar-light bg-light px-3">
-    <a class="navbar-brand" href="{% url 'home' %}">Inklings</a>
+<nav class="navbar fixed-top navbar-light bg-light px-3 border-bottom border-dark">
+    <a class="navbar-brand text-dark" href="{% url 'home' %}">Inklings</a>
     <nav>
         {% if user.is_authenticated %}
             {% include '_user_actions.html' %}

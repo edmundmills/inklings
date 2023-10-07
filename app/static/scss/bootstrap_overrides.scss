@@ -1,6 +1,16 @@
-$theme-colors: (
-    "primary": #123456
-);
+$primary: #D4A373;
+$secondary: #CCD5AE;
+$light: #FAEDCD;
+$white: #FEFAE0;
+$black: #272838;
+$dark: #3A606E;
+$warning: #E26D5C;
+$info: #D4C1EC;
+$danger: #8F2D56;
+$success: #387D7A;
+
+$link-color: $dark;
+$link-hover-color: $info;
 
 // Import Bootstrap
 @import "~bootstrap/scss/bootstrap";
@@ -12,4 +22,14 @@ body {
 
 h1, h2, h3, h4, h5, h6, .btn, .navbar {
     font-family: 'Raleway', sans-serif;
+}
+
+.nav-link {
+    &.active {
+        background-color: $primary !important;
+    }
+}
+
+.bg-white {
+    background-color: $white !important;
 }
