@@ -36,6 +36,5 @@ urlpatterns = [
     path('tag/<int:pk>/edit/', views.UpdateTagView.as_view(), name='update_tag'),
     path('tags/merge/', views.merge_tags, name='merge_tags'),
 
-
     path('martor/', include('martor.urls')),
 ]
