@@ -1,0 +1,12 @@
+<div class="card text-bg-white mb-2">
+    <div class="card-body">
+        {% if object.type == 'Memo' %}
+            {{ object.object.title }}
+        {% elif object.type == 'Inkling' %}
+            {{ object.object.content }}
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        {% include '_tags.html' with tags=object.object.tags.all %}
+    </div>
+</div>

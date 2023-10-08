@@ -1,0 +1,8 @@
+<div class="card text-bg-white mb-2">
+    <div class="card-body">
+        <h2>#{{ tag.name }}</h2>
+    </div>
+    <div class="card-footer">
+        {% include '_tags.html' with tags=similar_tags %}
+    </div>
+</div>

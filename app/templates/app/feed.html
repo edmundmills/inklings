@@ -5,8 +5,10 @@
     {% include "_sidebar_action.html" %}
     {% include "_sidebar.html" %}
     <div class="flex-grow-1 p-2" style="overflow-y: auto;">
-        {% block content %}
-        {% endblock %}
+        <div class="mb-2">
+            {% block feed_object %}{% endblock %}
+        </div>
+        {% include '_feed.html' %}
     </div>
     {% if inkling or tag or memo %}
         {% include "_similar_sidebar.html" %}

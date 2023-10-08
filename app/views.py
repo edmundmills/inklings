@@ -1,8 +1,10 @@
+import itertools
+
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import (CreateView, DetailView, ListView, UpdateView,
@@ -12,8 +14,8 @@ from pgvector.django import CosineDistance
 from .ai import create_inklings, get_tags, get_tags_and_title
 from .forms import InklingFormset, LinkTypeForm, MemoForm, TagForm
 from .helpers import (FILTER_THRESHOLD, create_tags, generate_embedding,
-                      get_all, get_similar, get_user_tags)
-from .models import Inkling, Link, LinkType, Memo, Tag, User
+                      get_all, get_link_groups, get_similar, get_user_tags)
+from .models import Inkling, Link, LinkType, Memo, Query, Tag, User
 
 
 def common_context(request, object = None) -> dict:
@@ -21,34 +23,56 @@ def common_context(request, object = None) -> dict:
     context.update(get_all(request.user)) # type: ignore
     if object is not None:
         context.update(get_similar(object, request.user)) # type: ignore
+        context['feed_objects'] = [dict(object=o, type=str(type(o).__name__)) for o in itertools.chain(context['similar_inklings'], context['similar_memos'])]
     context['link_types'] = LinkType.objects.filter(user=request.user)
     return context
 
 
-def get_link_groups(inkling) -> dict[LinkType, list[Link]]:
-        # Query for links where the current inkling is the source
-    current_to_selected_links = Link.objects.filter(source_inkling=inkling)
-    current_to_selected_links = current_to_selected_links.select_related('link_type').order_by('link_type__name')
+@method_decorator(login_required, name='dispatch')
+class FeedView(DetailView):
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
 
-    # Query for links where the current inkling is the target
-    selected_to_current_links = Link.objects.filter(target_inkling=inkling)
-    selected_to_current_links = selected_to_current_links.select_related('link_type').order_by('link_type__name')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(common_context(self.request, self.object)) # type: ignore
+        context['object_type'] = self.object.__class__.__name__ # type: ignore
+        return context
 
-    # Create a dictionary to group links by LinkType
-    link_groups = {}
-    
-    for link in current_to_selected_links:
-        link_type = link.link_type.name
-        if link_type not in link_groups:
-            link_groups[link_type] = []
-        link_groups[link_type].append(link.target_inkling)  # type: ignore
-    
-    for link in selected_to_current_links:
-        link_type = link.link_type.reverse_name
-        if link_type not in link_groups:
-            link_groups[link_type] = []
-        link_groups[link_type].append(link.source_inkling)  # type: ignore
-    return link_groups
+
+@method_decorator(login_required, name='dispatch')
+class MemoFeedView(FeedView):
+    model = Memo
+    template_name = 'feed_memo.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class InklingFeedView(FeedView):
+    model = Inkling
+    template_name = 'feed_inkling.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['link_groups'] = get_link_groups(self.object) # type: ignore
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class TagFeedView(FeedView):
+    model = Tag
+    template_name = 'feed_tag.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class QueryFeedView(FeedView):
+    model = Query # type: ignore
+    template_name = 'feed_query.html'
+
+    def get_object(self, queryset=None):
+        query = self.request.GET.get('query')
+        embedding = generate_embedding(query)
+        return Query(query, embedding) # type: ignore
+
 
 @method_decorator(login_required, name='dispatch')
 class MemoListView(ListView):
@@ -67,49 +91,6 @@ class MemoListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(common_context(self.request))
-        return context
-
-
-@method_decorator(login_required, name='dispatch')
-class MemoDetailView(DetailView):
-    model = Memo
-    template_name = 'view_memo.html'
-
-    def get_queryset(self):
-        return Memo.objects.filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(common_context(self.request, self.object)) # type: ignore
-        return context
-
-
-@method_decorator(login_required, name='dispatch')
-class InklingDetailView(DetailView):
-    model = Inkling
-    template_name = 'view_inkling.html'
-
-    def get_queryset(self):
-        return Inkling.objects.filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(common_context(self.request, self.object)) # type: ignore
-        context['link_groups'] = get_link_groups(self.object) # type: ignore
-        return context
-
-
-@method_decorator(login_required, name='dispatch')
-class TagDetailView(DetailView):
-    model = Tag
-    template_name = 'view_tag.html'
-    
-    def get_queryset(self):
-        return Tag.objects.filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(common_context(self.request, self.object)) # type: ignore
         return context
 
 
@@ -235,15 +216,6 @@ def process_memo(request, pk):
     return redirect('home')
     
 
-@login_required
-def search(request):
-    MAX_TAGS = 10
-    query = request.GET.get('query', '')
-    embedding = generate_embedding(query)
-    inklings = Inkling.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')
-    tags = Tag.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')[:MAX_TAGS]
-    memos = Memo.objects.filter(user=request.user).alias(distance=CosineDistance('embedding', embedding)).filter(distance__lt=FILTER_THRESHOLD).order_by('distance')
-    return render(request, 'search.html', dict(query=query, inklings=inklings, tags=tags, memos=memos, **get_all(request.user)))
 
 
 @login_required

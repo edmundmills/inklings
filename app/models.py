@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+import numpy as np
 from django.contrib.auth.models import User
 from django.db import models
 from martor.models import MartorField
@@ -61,3 +64,9 @@ class Link(models.Model):
     
     class Meta:
         unique_together = ['source_inkling', 'target_inkling', 'link_type']
+
+
+@dataclass
+class Query:
+    query: str
+    embedding: np.ndarray
