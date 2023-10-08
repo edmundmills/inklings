@@ -1,7 +1,0 @@
-<div class="mb-2">
-    {% if object.type == 'Memo' %}
-        {% include '_feed_memo.html' with memo=object.object %}
-    {% elif object.type == 'Inkling' %}
-        {% include '_feed_inkling.html' with inkling=object.object %}
-    {% endif %}
-</div>

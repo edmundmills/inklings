@@ -1,6 +1,6 @@
 <div class="btn-group" role="group">
   {% if current_inkling and inkling.pk != current_inkling.pk %}
-    {% include '_inkling_link_button.html' with inkling=inkling current_inkling=current_inkling%}
+    {% include 'inkling/_link_button.html' with inkling=inkling current_inkling=current_inkling%}
   {% endif %}
   <div class="dropdown">
       <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>

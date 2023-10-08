@@ -27,7 +27,7 @@ class DeleteTagView(SimilarObjectMixin, DeleteView, UserScopedMixin):
 class UpdateTagView(LoginRequiredMixin, UpdateView):
     model = Tag
     form_class = TagForm
-    template_name = 'path_to_tag_update_template.html'  # You'd have to specify the path to your template
+    template_name = 'tag/edit.html'  # You'd have to specify the path to your template
     context_object_name = 'tag'
     pk_url_kwarg = 'pk'  # This captures the primary key from the URL
 

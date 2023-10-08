@@ -18,7 +18,7 @@ from app.models import Memo
 @method_decorator(login_required, name='dispatch')
 class MemoListView(ListView):
     model = Memo
-    template_name = 'home.html'
+    template_name = 'layouts/home.html'
     
     def get_queryset(self):
         return Memo.objects.filter(user=self.request.user).order_by('-created_at')
@@ -40,7 +40,7 @@ class MemoCreateAndRedirectToEditView(View, LoginRequiredMixin):
 class MemoEditView(UpdateView, LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixin):
     model = Memo
     fields = ['title', 'content']
-    template_name = 'edit_memo.html'
+    template_name = 'memo/edit.html'
 
 
 class DeleteMemoView(SimilarObjectMixin, DeleteView, UserScopedMixin):

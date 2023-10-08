@@ -1,15 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base.html' %}
 
 {% block layout %}
 <div class="d-flex flex-row px-0 h-100 bg-light">
-    {% include "_sidebar_action.html" %}
-    {% include "_sidebar.html" %}
+    {% include "layouts/_sidebar_action.html" %}
+    {% include "layouts/_sidebar.html" %}
     <div class="flex-grow-1 p-2" style="overflow-y: auto;">
         {% block content %}
         {% endblock %}
     </div>
-    {% if inkling or tag or memo %}
-        {% include "_similar_sidebar.html" %}
-    {% endif %}
 </div>
 {% endblock %}

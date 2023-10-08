@@ -19,13 +19,13 @@ class CreateLinkTypeView(LoginRequiredMixin, CreateView, RedirectBackMixin):
 
 class LinkTypeListView(ListView, LoginRequiredMixin, UserScopedMixin):
     model = LinkType
-    template_name = 'link_type_list.html'
+    template_name = 'link_type/list.html'
 
 
 class EditLinkTypeView(LoginRequiredMixin, UpdateView, UserScopedMixin, RedirectBackMixin):
     model = LinkType
     form_class = LinkTypeForm
-    template_name = 'edit_link_type.html'
+    template_name = 'link_type/edit.html'
     context_object_name = 'link_type'
 
 

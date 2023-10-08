@@ -20,7 +20,6 @@ class CreateInklingView(LoginRequiredMixin, CreateView, GenerateTitleAndTagsMixi
     form_class = InklingForm
 
 
-
 class DeleteInklingView(SimilarObjectMixin, DeleteView, UserScopedMixin):
     model = Inkling
     success_url = '/'

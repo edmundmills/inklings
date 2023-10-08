@@ -1,4 +1,4 @@
-<div class="card bg-white">
+<div class="card border-dark bg-white">
     <div class="card-body">
         <div class="d-flex flex-row">
             <div class="flex-grow-1">
@@ -7,17 +7,11 @@
                 </a>        
             </div>
             <div>
-                {% include "_inkling_actions.html" with inkling=inkling %}
+                {% include "inkling/_actions.html" with inkling=inkling %}
             </div>
         </div>
     </div>
     <div class="card-footer">
-        <span>
-            {% if inkling.tags.all %}
-            {% for tag in inkling.tags.all %}
-                {% include "_tag.html" with tag=tag %}
-            {% endfor %}
-            {% endif %}    
-        </span>
+        {% include 'tag/_list_span.html' with tags=inkling.tags.all %}
     </div>
 </div>

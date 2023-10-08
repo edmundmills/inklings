@@ -17,7 +17,7 @@ from app.models import Reference
 class EditReferenceView(UpdateView, LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixin):
     model = Reference
     fields = ['title', 'content']
-    template_name = 'edit_reference.html'
+    template_name = 'reference/edit.html'
 
 
 class DeleteReferenceView(SimilarObjectMixin, DeleteView, UserScopedMixin):

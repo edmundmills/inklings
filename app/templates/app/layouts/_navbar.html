@@ -2,7 +2,7 @@
     <a class="navbar-brand text-dark" href="{% url 'home' %}">Inklings</a>
     <nav>
         {% if user.is_authenticated %}
-            {% include '_user_actions.html' %}
+            {% include 'layouts/_user_actions.html' %}
         {% else %}
             <a class="btn btn-primary" href="{% url 'login'%}">Sign In</a>
         {% endif %}

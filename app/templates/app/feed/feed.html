@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base.html' %}
 
 {% block layout %}
 <div class="d-flex flex-row px-0 h-100 bg-light">
-    {% include "_sidebar_action.html" %}
-    {% include "_sidebar.html" %}
+    {% include "layouts/_sidebar_action.html" %}
+    {% include "layouts/_sidebar.html" %}
     <div class="flex-grow-1 p-2 h-100 d-flex flex-column" style="overflow-y: auto;">
         <div class="mb-2">
             {% block feed_object %}{% endblock %}
@@ -18,10 +18,10 @@
         </ul>
         <div class="tab-content flex-grow-1" style="overflow-y: auto;">
             <div class="tab-pane fade active show" id="explore">
-                {% include '_feed_explore.html' %}
+                {% include 'feed/_explore.html' %}
             </div>
             <div class="tab-pane fade" id="related">
-                {% include '_feed_related.html' %}
+                {% include 'feed/_related.html' %}
             </div>
         </div>
     </div>
