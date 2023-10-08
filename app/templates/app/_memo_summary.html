@@ -1,8 +1,17 @@
+{% load martortags %}
+
 <div class="card border-dark bg-white">
     <div class="card-body">
-        <a href="{% url 'view_memo' memo.id %}">
-            {{ memo.title }}
-        </a>
+        <div class="d-flex flex-row pb-1">
+            <div class="flex-grow-1">
+                <a href="{% url 'view_memo' memo.id %}">
+                    {{ memo.title }}
+                </a>        
+            </div>
+        </div>
+        <div class="border bg-light collapse collapse-content p-1" id="memoCollapse" type="button" data-bs-toggle="collapse" data-bs-target="#memoCollapse" aria-expanded="false" aria-controls="memoCollapse">
+            {{ memo.content|safe_markdown }}
+        </div>
     </div>
     <div class="card-footer">
         <span>

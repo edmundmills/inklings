@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from .config import DEFAULT_LINK_TYPES, DEFAULT_TAGS
 from .helpers import generate_embedding
 from .models import Inkling, LinkType, Memo, Tag
 
@@ -9,9 +10,9 @@ from .models import Inkling, LinkType, Memo, Tag
 @receiver(post_save, sender=User)
 def create_default_keywords(sender, instance, created, **kwargs):
     if created:
-        for tag_name in Tag.DEFAULT_TAGS:
+        for tag_name in DEFAULT_TAGS:
             Tag.objects.create(name=tag_name, user=instance)
-        for forward_name, reverse_name in LinkType.DEFAULT_LINK_TYPES:
+        for forward_name, reverse_name in DEFAULT_LINK_TYPES:
             LinkType.objects.create(name=forward_name, reverse_name=reverse_name, user=instance)
 
 @receiver(post_save, sender=Inkling)

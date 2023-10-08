@@ -1,0 +1,18 @@
+{% load martortags %}
+
+<div class="card bg-white">
+    <div class="card-body">
+        <a href="{% url 'view_memo' memo.id %}">
+            {{ memo.title }}
+        </a>
+    </div>
+    <div class="card-footer">
+        <span>
+            {% if memo.tags.all %}
+            {% for tag in memo.tags.all %}
+                {% include "_tag.html" with tag=tag %}
+            {% endfor %}
+            {% endif %}    
+        </span>
+    </div>
+</div>

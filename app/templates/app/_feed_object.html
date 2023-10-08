@@ -1,12 +1,7 @@
-<div class="card text-bg-white mb-2">
-    <div class="card-body">
-        {% if object.type == 'Memo' %}
-            {{ object.object.title }}
-        {% elif object.type == 'Inkling' %}
-            {{ object.object.content }}
-        {% endif %}
-    </div>
-    <div class="card-footer">
-        {% include '_tags.html' with tags=object.object.tags.all %}
-    </div>
+<div class="mb-2">
+    {% if object.type == 'Memo' %}
+        {% include '_feed_memo.html' with memo=object.object %}
+    {% elif object.type == 'Inkling' %}
+        {% include '_feed_inkling.html' with inkling=object.object %}
+    {% endif %}
 </div>

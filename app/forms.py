@@ -34,33 +34,7 @@ class LinkTypeForm(forms.ModelForm):
 class InklingForm(forms.ModelForm):
     class Meta:
         model = Inkling
-        fields = ['content']
+        fields = ['title', 'content']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3}),
         }
-
-
-
-class BaseInklingFormSet(forms.BaseInlineFormSet):
-    def clean(self):
-        """Check that no two inklings have the same title and content."""
-        super().clean()
-
-        for form in self.forms:
-            # Skip forms marked for deletion
-            if self.can_delete and self._should_delete_form(form):  # type: ignore
-                print('skip')
-                continue
-
-            content = form.cleaned_data.get('content')
-            if not content:
-                # remove the form from self.forms if it's empty
-                self.forms.remove(form)
-
-
-InklingFormset = forms.inlineformset_factory(
-    Memo, 
-    Inkling,
-    form=InklingForm,
-    formset=BaseInklingFormSet,  # specify the custom formset class here
-)

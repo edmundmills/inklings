@@ -12,10 +12,9 @@ from django.views.generic import (CreateView, DetailView, ListView, UpdateView,
 from pgvector.django import CosineDistance
 
 from .ai import create_inklings, get_tags, get_tags_and_title
-from .forms import InklingFormset, LinkTypeForm, MemoForm, TagForm
-from .helpers import (FILTER_THRESHOLD, create_tags, generate_embedding,
-                      get_all, get_link_groups, get_similar, get_user_tags)
-from .models import Inkling, Link, LinkType, Memo, Query, Tag, User
+from .forms import LinkTypeForm, MemoForm, TagForm
+from .helpers import generate_embedding
+from .models import Inkling, Link, LinkType, Memo, NodeModel, Query, Tag, User
 
 
 def common_context(request, object = None) -> dict:
@@ -34,9 +33,11 @@ class FeedView(DetailView):
         return self.model.objects.filter(user=self.request.user)
 
     def get_context_data(self, **kwargs):
+        object = self.object # type: ignore
         context = super().get_context_data(**kwargs)
-        context.update(common_context(self.request, self.object)) # type: ignore
-        context['object_type'] = self.object.__class__.__name__ # type: ignore
+        context.update(common_context(self.request, object))
+        if isinstance(object, NodeModel):
+            context['link_groups'] = object.get_link_groups()
         return context
 
 
@@ -53,7 +54,7 @@ class InklingFeedView(FeedView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['link_groups'] = get_link_groups(self.object) # type: ignore
+        context['link_groups'] = self.object.get_link_groups(self.object) # type: ignore
         return context
 
 
@@ -129,9 +130,9 @@ class MemoEditView(UpdateView):
         memo.embedding = generate_embedding(memo.content)
         title = None if memo.title == "Untitled" else memo.title
         if (not title) or (not memo.tags.exists()):
-            user_tags = get_user_tags(self.request.user) # type: ignore
+            user_tags = self.request.user.tag_set.all() # type: ignore
             ai_content = get_tags_and_title(memo.content, title, user_tags)
-            create_tags(ai_content['tags'], memo)
+            memo.create_tags(ai_content['tags'])
 
             if not title:
                 title = ai_content.get('title')
@@ -151,10 +152,10 @@ def create_inkling(request):
     if not content:
         return redirect('home')
     
-    user_tags = get_user_tags(request.user)
+    user_tags = request.user.tag_set.all() # type: ignore
     ai_content = get_tags_and_title(content, None, user_tags)
     inkling = Inkling.objects.create(content=content, user=request.user)
-    create_tags(ai_content['tags'], inkling)
+    inkling.create_tags(ai_content['tags'])
 
     return redirect('view_inkling', inkling.id)  # type: ignore
 
@@ -208,10 +209,10 @@ def process_memo(request, pk):
                 inkling.save()
 
             if inklings:
-                user_tags = get_user_tags(request.user)
+                user_tags = request.user.tag_set.all() # type: ignore
                 created_tags = get_tags([i.content for i in inklings], user_tags)
                 for tags, inkling in zip(created_tags, inklings):
-                    create_tags(tags, inkling)
+                    inkling.create_tags(tags)
             return redirect('view_memo', memo.id)  # type: ignore
     return redirect('home')
     
