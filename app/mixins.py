@@ -2,12 +2,13 @@
 from django.db.models import F
 
 from app.embeddings import generate_embedding
-from app.prompting import get_tags_and_title
+from app.prompting import ChatGPT, get_tags_and_title
 
 from .models import NodeModel
 
 
 class GenerateTitleAndTagsMixin:
+    completer = ChatGPT() 
     def form_valid(self, form):
         object = form.save(commit=False)
         if not isinstance(object, NodeModel):
@@ -15,7 +16,7 @@ class GenerateTitleAndTagsMixin:
         title = None if object.title == "Untitled" else object.title
         if (not title) or (not object.tags.exists()):
             user_tags = self.request.user.tag_set.all() # type: ignore
-            ai_content = get_tags_and_title(object.content, title, user_tags)
+            ai_content = get_tags_and_title(self.completer, object.content, title, user_tags)
             object.create_tags(ai_content['tags'])
 
             if not title:

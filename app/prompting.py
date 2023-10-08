@@ -1,6 +1,7 @@
 import json
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 import openai
 
@@ -19,13 +20,27 @@ class Prompt:
     def messages(self) -> list[dict]:
         return [{"role": "system", "content": self.full_system_prompt}, {"role": "user", "content": self.user_prompt}]
 
-    def complete(self, temperature: float = 0, model: str = "gpt-3.5-turbo") -> dict:
-        completion = openai.ChatCompletion.create(model=model, messages=self.messages, temperature=temperature)
+
+
+class Completer(ABC):
+    @abstractmethod
+    def __call__(self, prompt: Prompt) -> dict:
+        ...
+
+
+@dataclass
+class ChatGPT(Completer):
+    temperature: float = 0.7
+    model: str = 'gpt-3.5-turbo'
+
+    def __call__(self, prompt: Prompt) -> dict:
+        completion = openai.ChatCompletion.create(model=self.model, messages=prompt.messages, temperature=self.temperature)
         content = completion.choices[0].message.content # type: ignore
         return json.loads(content)
 
 
-def get_tags_and_title(text: str, title: Optional[str], existing_tags: list[str]) -> dict:
+
+def get_tags_and_title(completer: Completer, text: str, title: Optional[str], existing_tags: list[str]) -> dict:
     format_instructions = '{"tags": ["tag_1", "tag_2", ...], "title": "generated_title"}'
     system_prompt = f"""You are a helpful assistant who provides tags, given a text. Create tags that address the intention of the text and its major themes. Strike a good balance between general and specific, creating keywords that will be relevant for other texts. Do not simply copy the terms from the text.
 
@@ -35,10 +50,10 @@ Give 3-7 tags. Do not give more than 7 tags.
 
 You also provide an appropriate title, if the existing title is None."""
     prompt = f"<h1>{title}</h1>\n{text}"
-    return Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=prompt).complete()
+    return completer(Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=prompt))
 
 
-def get_tags(contents: list[str], existing_tags: list[str]) -> list[list[str]]:
+def get_tags(completer: Completer, contents: list[str], existing_tags: list[str]) -> list[list[str]]:
     format_instructions = '{"tags": {"0": ["text_0_tag_1", "text_0_tag_2", ...], "1": ["text_1_tag_1", "text_1_tag_2", ...], ...]}'
     system_prompt = f"""You are a helpful assistant who provides tags for texts. You are given a list of texts, and you return a dictionary of lists of tags, one list for each text. The key for each list is the index of the text in the provided list.
 
@@ -49,12 +64,12 @@ You have a list of existing tags. If an existing tag applies to the text, return
 Give 3-7 tags per text. Do not give more than 7 tags for a single text.
 
 Return a list of tags for EACH text, in the same order the texts are provided."""
-    out = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=str(contents)).complete()['tags']
-    return [out[str(i)] for i in range(len(out))]
+    prompt = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=str(contents))
+    out = completer(prompt)
+    return [out['tags'][str(i)] for i in range(len(out))]
 
 
-
-def create_inklings(text: str, title: str) -> list[dict]:
+def create_inklings(completer: Completer, text: str, title: str) -> list[dict]:
     format_instructions = '{"ideas": ["idea_1", "idea_2", ...]"}'
     system_prompt = f"""You are a helpful assistant who distills the key ideas from a given text.
 
@@ -68,5 +83,5 @@ When expressing the ideas, keep in mind:
 - Each may be a single sentence to a short paragraph.
 - The ideas do not need to be copied from the text verbatim. Try to give them in the voice of the person who wrote the text.
 - Each idea should be able to stand on its own as an insightful quote or tweet.  Their meaning should be understood without seeing the main text or any of the other ideas."""
-    out = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=f"<h1>{title}</h1>\n{text}").complete(model='gpt-4', temperature=0.7)['ideas']
-    return out
+    prompt = Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=f"<h1>{title}</h1>\n{text}")
+    return completer(prompt)['ideas']
