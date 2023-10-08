@@ -4,7 +4,7 @@ from django.dispatch import receiver
 
 from .config import DEFAULT_LINK_TYPES, DEFAULT_TAGS
 from .embeddings import generate_embedding
-from .models import Inkling, LinkType, Memo, Tag
+from .models import Inkling, LinkType, Memo, Reference, Tag
 
 
 @receiver(post_save, sender=User)
@@ -18,11 +18,17 @@ def create_default_keywords(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Inkling)
 def generate_and_save_embedding_for_inkling(sender, instance, **kwargs):
     if instance.embedding is None:
-        instance.embedding = generate_embedding(instance.content)
+        instance.embedding = generate_embedding(f'{instance.title}: {instance.content}')
         instance.save(update_fields=['embedding'])
 
 @receiver(post_save, sender=Memo)
 def generate_and_save_embedding_for_memo(sender, instance, **kwargs):
+    if instance.embedding is None:
+        instance.embedding = generate_embedding(f'{instance.title}: {instance.content}')
+        instance.save(update_fields=['embedding'])
+
+@receiver(post_save, sender=Reference)
+def generate_and_save_embedding_for_reference(sender, instance, **kwargs):
     if instance.embedding is None:
         instance.embedding = generate_embedding(f'{instance.title}: {instance.content}')
         instance.save(update_fields=['embedding'])
