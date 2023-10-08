@@ -56,6 +56,8 @@ class Link(UserOwnedModel, TimeStampedModel):
 
 
 class NodeModel(UserOwnedModel, TimeStampedModel):
+    title = models.CharField(max_length=255)
+    content = MartorField()
     source_links = GenericRelation(Link, content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
     target_links = GenericRelation(Link, content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
     tags = models.ManyToManyField('Tag', blank=True)
@@ -93,16 +95,11 @@ class NodeModel(UserOwnedModel, TimeStampedModel):
 
 
 class Memo(NodeModel):
-    title = models.CharField(max_length=255)
-    content = MartorField()
-
     class Meta:
         ordering = ['-created_at']
 
 
 class Reference(NodeModel):
-    title = models.CharField(max_length=255)
-    content = MartorField()
     source_url = models.URLField(max_length=2000, blank=True, null=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
     publication_date = models.DateField(blank=True, null=True)
@@ -113,9 +110,6 @@ class Reference(NodeModel):
 
 
 class Inkling(NodeModel):
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-    
     class Meta:
         ordering = ['-created_at']
 

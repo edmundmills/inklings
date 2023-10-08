@@ -21,28 +21,36 @@ from django.urls import include, path
 from app import views
 
 urlpatterns = [
+    path('', views.MemoListView.as_view(), name='home'),
+
     path('admin/', admin.site.urls),
     path('accounts/signup/', views.signup_view, name='signup'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html', next_page='home'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('', views.MemoListView.as_view(), name='home'),
-    path('memo/<int:pk>/', views.MemoFeedView.as_view(), name='view_memo'),
-    path('memo/<int:pk>/delete/', views.delete_memo, name='delete_memo'),
-    path('memo/<int:pk>/edit/', views.MemoEditView.as_view(), name='edit_memo'),
+
+    path('memo/<int:pk>/', views.MemoListView.as_view(), name='view_memo'),
     path('memos/new/', views.MemoCreateAndRedirectToEditView.as_view(), name='new_memo'),
-    path('memo/<int:pk>/process/', views.process_memo, name='process_memo'),
+    path('memo/<int:pk>/edit/', views.MemoEditView.as_view(), name='edit_memo'),
+    path('memo/<int:pk>/delete/', views.DeleteMemoView.as_view(), name='delete_memo'),
+
     path('tag/<int:pk>/', views.TagFeedView.as_view(), name='view_tag'),
-    path('tag/<int:pk>/delete/', views.delete_tag, name='delete_tag'),
-    path('tag/<int:pk>/update/', views.update_tag, name='update_tag'),
+    path('tag/<int:pk>/delete/', views.DeleteTagView.as_view(), name='delete_tag'),
+    path('tag/<int:pk>/edit/', views.UpdateTagView.as_view(), name='update_tag'),
+    path('tags/merge/', views.merge_tags, name='merge_tags'),
+    
     path('inkling/<int:pk>/', views.InklingFeedView.as_view(), name='view_inkling'),
-    path('inkling/<int:pk>/delete/', views.delete_inkling, name='delete_inkling'),
-    path('inklings/create/', views.create_inkling, name='create_inkling'),
-    path('create_link/', views.create_link, name='create_link'),
-    path('create_link_type/', views.create_link_type, name='create_link_type'),
+    path('inkling/<int:pk>/delete/', views.DeleteInklingView.as_view(), name='delete_inkling'),
+    path('inklings/create/', views.CreateInklingView.as_view(), name='create_inkling'),
+    
     path('search/', views.QueryFeedView.as_view(), name='search'),
-    path('merge_tags/', views.merge_tags, name='merge_tags'),
+    
+    path('links/create/', views.CreateLinkView.as_view(), name='create_link'),
+    path('link/<int:pk>/delete/', views.DeleteLinkView.as_view(), name='delete_link'),
+    
     path('link_types/', views.LinkTypeListView.as_view(), name='link_types'),
-    path('link_type/<int:pk>/edit/', views.edit_link_type, name='edit_link_type'),
-    path('link_type/<int:pk>/delete/', views.delete_link_type, name='delete_link_type'),
+    path('link_types/create', views.CreateLinkTypeView.as_view(), name='create_link_type'),
+    path('link_type/<int:pk>/edit/', views.EditLinkTypeView.as_view(), name='edit_link_type'),
+    path('link_type/<int:pk>/delete/', views.DeleteLinkTypeView.as_view(), name='delete_link_type'),
+    
     path('martor/', include('martor.urls')),
 ]

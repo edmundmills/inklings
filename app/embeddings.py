@@ -88,10 +88,5 @@ def generate_embedding(text):
 #     return similar_fns[type(object)](object, user)
 
 
-# def get_all(user: User) -> dict:
-#     context = dict()
-#     context['all_memos'] = Memo.objects.filter(user=user).order_by('-created_at')
-#     context['all_tags'] =  Tag.objects.filter(user=user).order_by('name')
-#     return context
 
 
