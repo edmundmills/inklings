@@ -11,9 +11,9 @@ from django.views.generic import (CreateView, DetailView, ListView, UpdateView,
                                   View)
 from pgvector.django import CosineDistance
 
-from .ai import create_inklings, get_tags, get_tags_and_title
+from .prompting import create_inklings, get_tags, get_tags_and_title
 from .forms import LinkTypeForm, MemoForm, TagForm
-from .helpers import generate_embedding
+from .embeddings import generate_embedding
 from .models import Inkling, Link, LinkType, Memo, NodeModel, Query, Tag, User
 
 

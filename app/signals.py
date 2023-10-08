@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .config import DEFAULT_LINK_TYPES, DEFAULT_TAGS
-from .helpers import generate_embedding
+from .embeddings import generate_embedding
 from .models import Inkling, LinkType, Memo, Tag
 
 
