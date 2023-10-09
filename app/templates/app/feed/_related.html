@@ -1,16 +1,23 @@
 {% include 'tag/_list_span.html' with tags=object.tags.all %}
 
 {% for link_type_and_direction, linked in linked_content.items %}
-    {{link_type.0}}
-    {{link_type.1}}
-    {{linked}}
+    <div>
+        {% if link_type_and_direction.1 == 'outgoing' %}
+            <h4>{{link_type_and_direction.0.name}}</h4>
+        {% else %}
+            <h4>{{link_type_and_direction.0.reverse_name}}</h4>
+        {% endif %}
+        {% for linked_object in linked %}
+            {% include 'feed/_object.html' with object=linked_object feed_origin_object=object show_link=False %}
+        {% endfor %}
+    </div>
 {% endfor %}
 
 {% if object.memo_set.exists %}
 <h4>Inklings</h4>
 {% for inkling in object.inkling_set.all %}
     <div class="mb-2">
-        {% include 'inkling/_card.html' %}
+        {% include 'feed/_object.html' with object=inkling feed_origin_object=object show_link=False %}
     </div>
 {% endfor %}
 {% endif %}
@@ -19,16 +26,16 @@
 <h4>Memos</h4>
 {% for memo in object.memo_set.all %}
 <div class="mb-2">
-    {% include 'memo/_summary.html' %}
+    {% include 'feed/_object.html' with object=memo feed_origin_object=object show_link=False %}
 </div>
 {% endfor %}
 {% endif %}
 
-{% if object.memo_set.exists %}
+{% if object.reference_set.exists %}
 <h4>Records</h4>
-{% for record in object.record_set.all %}
+{% for reference in object.reference_set.all %}
 <div class="mb-2">
-    <!-- {% include 'memo/_summary.html' %} -->
+    {% include 'feed/_object.html' with object=reference feed_origin_object=object show_link=False %}
 </div>
 {% endfor %}
 {% endif %}

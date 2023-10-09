@@ -9,7 +9,9 @@
                 </a>
             </div>
             <div>
-                {% include "feed/_link_button.html" with source_object=feed_origin_object target_object=object %}
+                {% if show_link %}
+                    {% include "feed/_link_button.html" with source_object=feed_origin_object target_object=object %}
+                {% endif %}
             </div>
         </div>
         <div>
