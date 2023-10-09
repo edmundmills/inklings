@@ -5,3 +5,5 @@ sentence-transformers
 openai
 psycopg2-binary
 martor
+django-tables2
+django-filter

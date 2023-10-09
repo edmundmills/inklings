@@ -17,11 +17,6 @@ class CreateLinkTypeView(LoginRequiredMixin, CreateView, RedirectBackMixin):
         return redirect(self.get_success_url())
 
 
-class LinkTypeListView(ListView, LoginRequiredMixin, UserScopedMixin):
-    model = LinkType
-    template_name = 'link_type/list.html'
-
-
 class EditLinkTypeView(LoginRequiredMixin, UpdateView, UserScopedMixin, RedirectBackMixin):
     model = LinkType
     form_class = LinkTypeForm

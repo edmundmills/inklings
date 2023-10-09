@@ -5,4 +5,5 @@ from .link_types import *
 from .links import *
 from .memos import *
 from .references import *
+from .tables import *
 from .tags import *

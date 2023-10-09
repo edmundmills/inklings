@@ -9,6 +9,9 @@ from django.views.decorators.http import require_POST
 from django.views.generic import (CreateView, DetailView, ListView, UpdateView,
                                   View)
 
+from app.mixins import UserScopedMixin
+from app.models import Memo
+
 
 def signup_view(request):
     if request.method == 'POST':
@@ -21,5 +24,18 @@ def signup_view(request):
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
+
+class HomeView(ListView, LoginRequiredMixin, UserScopedMixin):
+    model = Memo
+    template_name = 'layouts/home.html'
+    
+    def get_queryset(self):
+        return Memo.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def dispatch(self, request, *args, **kwargs):
+        memos = Memo.objects.filter(user=self.request.user).order_by('-updated_at') 
+        if memos.exists():
+            return redirect('view_memo', memos[0].pk)
+        return super().dispatch(request, *args, **kwargs)
 
 

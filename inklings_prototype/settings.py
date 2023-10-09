@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_tables2',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'app.context_processors.sidebar_data',
+                'django.template.context_processors.request'
             ],
         },
     },
@@ -207,3 +210,5 @@ ALLOWED_HTML_ATTRIBUTES = [
     "scope", "src", "style", "title", "type", "width"
 ]
 CSRF_COOKIE_HTTPONLY = False
+
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5.html"
