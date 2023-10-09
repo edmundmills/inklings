@@ -1,5 +1,6 @@
 
-from django.db.models import F
+from django.shortcuts import redirect
+from pgvector.django import CosineDistance
 
 from app.embeddings import generate_embedding
 from app.prompting import ChatGPT, get_tags_and_title
@@ -8,25 +9,29 @@ from .models import NodeModel
 
 
 class GenerateTitleAndTagsMixin:
-    completer = ChatGPT() 
+    completer = ChatGPT()
+
     def form_valid(self, form):
         object = form.save(commit=False)
+        object.user = self.request.user # type: ignore
         if not isinstance(object, NodeModel):
             return super().form_valid(self, form) # type: ignore
         title = None if object.title == "Untitled" else object.title
         if (not title) or (not object.tags.exists()):
             user_tags = self.request.user.tag_set.all() # type: ignore
             ai_content = get_tags_and_title(self.completer, object.content, title, user_tags)
-            object.create_tags(ai_content['tags'])
-
             if not title:
                 title = ai_content.get('title')
             if title:
                 object.title = title
-
+            tags = ai_content['tags']
+        else:
+            tags = []
         object.embedding = generate_embedding(f'{object.title}: {object.content}')
         object.save()  # Save to the database
-        return redirect(self.success_url) # type: ignore
+        object.create_tags(tags)
+        self.object = object
+        return redirect(self.get_success_url()) # type: ignore
 
 
 class RedirectBackMixin:
@@ -44,6 +49,8 @@ class LinkedContentMixin:
         context = super().get_context_data(**kwargs) # type: ignore
         if isinstance(self.object, NodeModel): # type: ignore
             context['linked_content'] = self.object.get_link_groups() # type: ignore
+            print(context['linked_content'])
+            print('test')
         return context
     
 
@@ -56,4 +63,5 @@ class SimilarObjectMixin:
         if not isinstance(object, NodeModel):
             return None
         embedding = object.embedding
-        return self.model.objects.filter(user=self.request.user).annotate(distance=F('embedding').distance(embedding)).order_by('distance').exclude(pk=object.pk).first()  # type: ignore
+        return self.model.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', embedding)).exclude(pk=object.pk).filter(distance__lt=0.5).order_by('distance').first() # type: ignore
+

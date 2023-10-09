@@ -1,18 +1,7 @@
-<div class="mb-2">
-    <h3>Similar Tags</h3>
-    {% include "tag/_list_span.html" with tags=similar_tags %}
-</div>
+{% include 'tag/_list_span.html' with tags=object.tags.all %}
 
-<h3>Similar Inklings</h3>
-{% for similar_inkling in similar_inklings %}
-    <div class="pb-2">
-        {% include "inkling/_card.html" with inkling=similar_inkling current_inkling=inkling %}
-    </div>
-{% endfor %}
-
-<h3>Similar Memos</h3>
-{% for similar_memo in similar_memos %}
-    <div class="pb-2">
-        {% include "memo/_summary.html" with memo=similar_memo %}
-    </div>
+{% for link_type_and_direction, linked in linked_content.items %}
+    {{link_type.0}}
+    {{link_type.1}}
+    {{linked}}
 {% endfor %}

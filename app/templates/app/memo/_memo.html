@@ -6,12 +6,7 @@
             </div>
             {% include '_memo_actions.html' with memo=memo %}
         </div>
-
-        {% if memo.tags.all %}
-            {% for tag in memo.tags.all %}
-                {% include "_tag.html" with tag=tag %}
-            {% endfor %}
-        {% endif %}
+        {% include 'tag/_list_span.html' with tags=memo.tags.all %}
 
         <div>{{ memo.content|safe_markdown }}</div>
     </div>

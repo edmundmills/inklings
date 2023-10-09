@@ -15,11 +15,7 @@
     </div>
     <div class="card-footer">
         <span>
-            {% if memo.tags.all %}
-            {% for tag in memo.tags.all %}
-                {% include "_tag.html" with tag=tag %}
-            {% endfor %}
-            {% endif %}    
+            {% include 'tag/_list_span.html' with tags=memo.tags.all %}
         </span>
     </div>
 </div>

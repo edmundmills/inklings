@@ -22,6 +22,7 @@
                 <form id="createInklingForm" method="post" action="{% url 'create_inkling' %}">
                     {% csrf_token %}
                     <div class="mb-3">
+                        <input class="form-control mb-2" id="title" name="title"></input>
                         <textarea class="form-control" id="content" name="content" rows="12" required></textarea>
                     </div>
                     <div class="modal-footer">

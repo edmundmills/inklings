@@ -14,7 +14,7 @@ class MemoCreateAndRedirectToEditView(View, LoginRequiredMixin):
         return redirect(reverse('edit_memo', args=[memo.id])) # type: ignore
 
 
-class MemoEditView(UpdateView, LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixin):
+class MemoEditView(LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixin, UpdateView):
     model = Memo
     fields = ['title', 'content']
     template_name = 'memo/edit.html'

@@ -2,11 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 
 from app.embeddings import generate_embedding
-from app.mixins import UserScopedMixin
+from app.mixins import LinkedContentMixin, UserScopedMixin
 from app.models import Inkling, Memo, Query, Reference, Tag
 
 
-class FeedView(LoginRequiredMixin, UserScopedMixin, DetailView):
+class FeedView(LoginRequiredMixin, UserScopedMixin, LinkedContentMixin, DetailView):
     pass
 
 

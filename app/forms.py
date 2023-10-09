@@ -60,6 +60,8 @@ class LinkTypeForm(forms.ModelForm):
 
 
 class InklingForm(forms.ModelForm):
+    title = forms.CharField(required=False)
+
     class Meta:
         model = Inkling
         fields = ['title', 'content']
