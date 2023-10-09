@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Optional, Union
 
 import numpy as np
@@ -13,8 +14,17 @@ from .models import (EmbeddableModel, Memo, NodeModel, Query, Tag,
 FILTER_THRESHOLD = 0.7
 
 
+MODEL = None
+
+def load_model():
+    global MODEL
+    if MODEL is None:
+        MODEL = SentenceTransformer('paraphrase-albert-small-v2')
+    return MODEL
+
+@lru_cache(maxsize=1000)
 def generate_embedding(text):
-    model = SentenceTransformer('paraphrase-albert-small-v2')
+    model = load_model()
     embedding = model.encode([text])[0]
     return embedding
 
