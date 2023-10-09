@@ -24,6 +24,9 @@ urlpatterns = [
     path('inklings/create/', views.CreateInklingView.as_view(), name='inkling_create'),
     
     path('references/', views.ReferenceListView.as_view(), name='references'),
+    path('references/create', views.ReferenceCreateView.as_view(), name='reference_create'),
+    path('reference/<int:pk>/', views.ReferenceFeedView.as_view(), name='reference_view'),
+    path('reference/<int:pk>/delete', views.DeleteReferenceView.as_view(), name='reference_delete'),
 
     path('search/', views.QueryFeedView.as_view(), name='search'),
     

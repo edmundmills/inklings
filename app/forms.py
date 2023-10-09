@@ -1,3 +1,4 @@
+import requests
 from django import forms
 from martor.fields import MartorFormField
 
@@ -41,6 +42,29 @@ class LinkForm(forms.ModelForm):
             cleaned_data['link_type'] = link_type_id.removesuffix('_reverse')
         cleaned_data['link_type'] = LinkType.objects.get(pk=int(link_type_id))
         return cleaned_data
+
+
+class URLReferenceForm(forms.Form):
+    url = forms.URLField(
+        max_length=1000, 
+        widget=forms.URLInput(attrs={'placeholder': 'https://www.example.com'}),
+        help_text="Enter a valid and accessible webpage URL.",
+        error_messages={
+            'invalid': "Please enter a valid URL.",
+        }
+    )
+
+    def clean_url(self):
+        url = self.cleaned_data.get('url')
+        
+        try:
+            response = requests.head(url, timeout=5)  # Using a HEAD request for faster validation
+            if response.status_code != 200:
+                raise forms.ValidationError("The provided URL is not accessible.")
+        except requests.RequestException:
+            raise forms.ValidationError("Failed to validate the URL. Ensure it's correct and accessible.")
+
+        return url
 
 
 class LinkTypeForm(forms.ModelForm):

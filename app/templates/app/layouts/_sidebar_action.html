@@ -2,6 +2,7 @@
     <div class="text-center my-1">
         <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createInklingModal" title="New Inkling"><i class="bi bi-pen"></i></a>
         <a href="{% url 'memo_create' %}" class="btn btn-primary m-1" title="New Memo"><i class="bi bi-journal-plus"></i></a>
+        <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createReferenceModal" title="New Reference"><i class="bi-bookmark-plus"></i></a>
         <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createLinkTypeModal" title="New Link Type"><i class="bi-node-plus"></i></a>
         <hr>
         <a href="{% url 'inklings' %}" class="btn btn-primary m-1" title="Inklings"><i class="bi bi-droplet"></i></a>
@@ -26,6 +27,29 @@
                     <div class="mb-3">
                         <input class="form-control mb-2" id="title" name="title"></input>
                         <textarea class="form-control" id="content" name="content" rows="12" required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>                
+            </div>
+        </div>
+    </div>
+</div>    
+<div class="modal fade" id="createReferenceModal" tabindex="-1" aria-labelledby="createReferenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createReferenceModalLabel">New Reference</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createReferenceForm" method="post" action="{% url 'reference_create' %}">
+                    {% csrf_token %}
+                    <div class="mb-3 form-group">
+                        <label class="form-label">Reference URL</label>
+                        <input class="form-control" id="url" name="url"></input>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
