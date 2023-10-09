@@ -7,6 +7,9 @@
                     <a class="nav-link {% if not tag %} active{% endif %}" id="memos-tab" data-bs-toggle="pill" href="#memos">Memos</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" id="references-tab" data-bs-toggle="pill" href="#references">References</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {% if tag %} active {% endif %}" id="tags-tab" data-bs-toggle="pill" href="#tags">Tags</a>
                 </li>
             </ul>    
@@ -29,6 +32,17 @@
                         <li class="nav-item">
                             <a href="{% url 'tag_view' a_tag.id %}" class="nav-link{% if tag.id == a_tag.id %} active{% endif %}">
                                 {{ a_tag.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="references">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    {% for a_reference in all_references %}
+                        <li class="nav-item">
+                            <a href="{% url 'reference_view' a_reference.id %}" class="nav-link{% if reference.id == a_reference.id %} active{% endif %}">
+                                {{ a_reference.title }}
                             </a>
                         </li>
                     {% endfor %}

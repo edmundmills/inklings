@@ -9,5 +9,6 @@ def sidebar_data(request):
         search_form=SearchForm(),
         all_memos=request.user.memo_set.all(),
         all_tags=request.user.tag_set.all(),
+        all_references=request.user.reference_set.all(),
         link_types=request.user.linktype_set.all(),
     )
