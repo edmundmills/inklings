@@ -1,7 +1,7 @@
 <div class="mb-2">
-    {% if object.type == 'Memo' %}
+    {% if object.class_name == 'Memo' %}
         {% include 'feed/_memo.html' with memo=object.object %}
-    {% elif object.type == 'Inkling' %}
+    {% elif object.class_name == 'Inkling' %}
         {% include 'feed/_inkling.html' with inkling=object.object %}
     {% endif %}
 </div>

@@ -55,27 +55,32 @@ class Link(UserOwnedModel, TimeStampedModel):
         ordering = ['link_type']
 
 
-class NodeModel(UserOwnedModel, TimeStampedModel):
-    title = models.CharField(max_length=255)
-    content = MartorField()
-    source_links = GenericRelation(Link, content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
-    target_links = GenericRelation(Link, content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
-    tags = models.ManyToManyField('Tag', blank=True)
+class EmbeddableModel(models.Model):
     embedding = VectorField(dimensions=768, null=True)
 
     class Meta:
         abstract = True
 
+
+class TaggableModel(UserOwnedModel):
+    tags = models.ManyToManyField('Tag', blank=True)
+
     def create_tags(self, tags: list[str]):
         with transaction.atomic():
-            # Create tags if they don't exist and collect them
             tag_objects = [
                 Tag.objects.get_or_create(name=tag_name.lower(), user=self.user)[0] 
                 for tag_name in tags
-            ]
-            
-            # Associate all tags with the object in one go
+            ]            
             self.tags.add(*tag_objects)
+
+    class Meta:
+        abstract = True
+
+class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel):
+    title = models.CharField(max_length=255)
+    content = MartorField()
+    source_links = GenericRelation(Link, content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
+    target_links = GenericRelation(Link, content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
 
     def all_links(self):
         content_type = ContentType.objects.get_for_model(self)
@@ -92,6 +97,9 @@ class NodeModel(UserOwnedModel, TimeStampedModel):
             target = link.target_content_object if direction == "outgoing" else link.source_content_object
             link_groups[key].append(target)
         return dict(link_groups)
+
+    class Meta:
+        abstract = True
 
 
 class Memo(NodeModel):
@@ -114,9 +122,8 @@ class Inkling(NodeModel):
         ordering = ['-created_at']
 
 
-class Tag(UserOwnedModel, TimeStampedModel):
+class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
     name = models.CharField(max_length=50)
-    embedding = VectorField(dimensions=768, null=True)
 
     def save(self, *args, **kwargs):
         self.name = self.name.lower().strip()

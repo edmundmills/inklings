@@ -1,12 +1,29 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 
-from app.embeddings import generate_embedding
+from app.embeddings import (generate_embedding, get_similar_nodes,
+                            sort_by_distance)
 from app.mixins import LinkedContentMixin, UserScopedMixin
 from app.models import Inkling, Memo, Query, Reference, Tag
 
 
-class FeedView(LoginRequiredMixin, UserScopedMixin, LinkedContentMixin, DetailView):
+class FeedContentMixin(LinkedContentMixin):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        feed_objects = []
+        object = self.object # type: ignore
+        for search_class in [Reference, Inkling, Memo]:
+            similar_nodes = get_similar_nodes(object, search_class, self.request.user, 10) # type: ignore
+            feed_objects.extend(similar_nodes)
+
+        feed_objects = sort_by_distance(object.embedding, feed_objects)
+        feed_objects = [dict(object=o, class_name=o.__class__.__name__) for o in feed_objects]
+        context['feed_objects'] = feed_objects
+        return context
+
+
+
+class FeedView(LoginRequiredMixin, UserScopedMixin, FeedContentMixin, DetailView):
     pass
 
 
