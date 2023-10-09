@@ -23,7 +23,7 @@ class TagFeedViewTest(BaseFeedViewTest):
         Tag.objects.create(user=cls.test_user, name="TestTag")
 
     def test_tag_feed_view(self):
-        self.view_url_accessible_by_name('view_tag', [Tag.objects.first().pk]) # type: ignore
+        self.view_url_accessible_by_name('tag_view', [Tag.objects.first().pk]) # type: ignore
 
 
 class SearchFeedViewTest(BaseFeedViewTest):
@@ -44,7 +44,7 @@ class MemoFeedViewTest(BaseFeedViewTest):
         Memo.objects.create(user=cls.test_user, title="TestTitle", content="TestContent")
 
     def test_tag_feed_view(self):
-        self.view_url_accessible_by_name('view_memo', [Memo.objects.first().pk]) # type: ignore
+        self.view_url_accessible_by_name('memo_view', [Memo.objects.first().pk]) # type: ignore
 
 
 class InklingFeedViewTest(BaseFeedViewTest):
@@ -54,6 +54,6 @@ class InklingFeedViewTest(BaseFeedViewTest):
         Inkling.objects.create(user=cls.test_user, title="TestTitle", content="TestContent")
 
     def test_tag_feed_view(self):
-        self.view_url_accessible_by_name('view_inkling', [Inkling.objects.first().pk]) # type: ignore
+        self.view_url_accessible_by_name('inkling_view', [Inkling.objects.first().pk]) # type: ignore
 
 

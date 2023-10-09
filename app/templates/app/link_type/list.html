@@ -8,10 +8,10 @@
             {{ link_type.name }} / {{ link_type.reverse_name }}
         </div>
         <div class="mx-1">
-            <a href="{% url 'edit_link_type' link_type.pk %}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editLinkTypeModal{{ link_type.pk }}" title="Edit"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'link_type_edit' link_type.pk %}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editLinkTypeModal{{ link_type.pk }}" title="Edit"><i class="bi bi-pencil"></i></a>
         </div>
         <div>
-            <a href="{% url 'delete_link_type' link_type.pk %}" class="btn btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this Tag?');"><i class="bi bi-trash"></i></a>
+            <a href="{% url 'link_type_delete' link_type.pk %}" class="btn btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this Tag?');"><i class="bi bi-trash"></i></a>
         </div>
     </div>
     {% endfor %}
@@ -26,7 +26,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{% url 'edit_link_type' link_type.pk %}">
+                <form method="post" action="{% url 'link_type_edit' link_type.pk %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="name{{ link_type.pk }}" class="form-label">Name</label>

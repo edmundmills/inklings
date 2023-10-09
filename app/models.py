@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import (GenericForeignKey,
                                                 GenericRelation)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
+from django.forms import ValidationError
 from martor.models import MartorField
 from pgvector.django import VectorField
 
@@ -21,6 +22,14 @@ class UserOwnedModel(models.Model):
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class TitleAndContentModel(models.Model):
+    title = models.CharField(max_length=255)
+    content = MartorField()
 
     class Meta:
         abstract = True
@@ -54,7 +63,6 @@ class Link(UserOwnedModel, TimeStampedModel):
         unique_together = ['source_content_type', 'source_object_id', 'target_content_type', 'target_object_id', 'link_type']
         ordering = ['link_type']
 
-
 class EmbeddableModel(models.Model):
     embedding = VectorField(dimensions=768, null=True)
 
@@ -76,9 +84,8 @@ class TaggableModel(UserOwnedModel):
     class Meta:
         abstract = True
 
+
 class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel):
-    title = models.CharField(max_length=255)
-    content = MartorField()
     source_links = GenericRelation(Link, content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
     target_links = GenericRelation(Link, content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
 
@@ -102,12 +109,12 @@ class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel
         abstract = True
 
 
-class Memo(NodeModel):
+class Memo(TitleAndContentModel, NodeModel):
     class Meta:
         ordering = ['-created_at']
 
 
-class Reference(NodeModel):
+class Reference(TitleAndContentModel, NodeModel):
     source_url = models.URLField(max_length=2000, blank=True, null=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
     publication_date = models.DateField(blank=True, null=True)
@@ -117,7 +124,7 @@ class Reference(NodeModel):
         ordering = ['-created_at']
 
 
-class Inkling(NodeModel):
+class Inkling(TitleAndContentModel, NodeModel):
     class Meta:
         ordering = ['-created_at']
 

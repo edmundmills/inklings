@@ -7,9 +7,10 @@ from app.mixins import RedirectBackMixin, UserScopedMixin
 from app.models import LinkType
 
 
-class CreateLinkTypeView(LoginRequiredMixin, CreateView, RedirectBackMixin):
+class CreateLinkTypeView(LoginRequiredMixin, RedirectBackMixin, CreateView):
     model = LinkType
     form_class = LinkTypeForm
+    
 
     def form_valid(self, form):
         form.instance.user = self.request.user

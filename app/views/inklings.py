@@ -20,7 +20,7 @@ class CreateInklingView(LoginRequiredMixin, GenerateTitleAndTagsMixin, CreateVie
     form_class = InklingForm
     
     def get_success_url(self):
-        return reverse('view_inkling', args=[self.object.pk])
+        return reverse('inkling_view', args=[self.object.pk])
 
 
 class DeleteInklingView(SimilarObjectMixin, UserScopedMixin, DeleteView):
@@ -33,4 +33,4 @@ class DeleteInklingView(SimilarObjectMixin, UserScopedMixin, DeleteView):
         similar_object = self.get_similar_object()
         if not similar_object:
             return reverse('home')
-        return reverse('view_inkling', args=[similar_object.pk])
+        return reverse('inkling_view', args=[similar_object.pk])

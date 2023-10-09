@@ -3,11 +3,16 @@ from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.utils.html import format_html, mark_safe  # type: ignore
 
-from .models import Inkling, LinkType, Memo, NodeModel, Reference
+from .models import Inkling, Link, LinkType, Memo, NodeModel, Reference
 
+TEMPLATE_NAME = "django_tables2/bootstrap5.html"
+
+def link_to_object_html(record):
+    url = reverse(f'{record._meta.model_name}_view', args=[record.pk])
+    return mark_safe(f'<a href="{url}">{record.title}</a>')
 
 def delete_action_html(record, csrf_token):
-    delete_url = reverse(f'delete_{record._meta.model_name}', args=[record.pk])
+    delete_url = reverse(f'{record._meta.model_name}_delete', args=[record.pk])
     return format_html(
         '''<form method="post" action="{}" onsubmit="return confirm('Are you sure you want to delete this {}?');">
             <input type="hidden" name="csrfmiddlewaretoken" value="{}">
@@ -19,7 +24,7 @@ def delete_action_html(record, csrf_token):
     )
 
 def edit_action_html(record):
-    edit_url = reverse(f'edit_{record._meta.model_name}', args=[record.pk])
+    edit_url = reverse(f'{record._meta.model_name}_edit', args=[record.pk])
     return format_html(
         '<a href="{}">Edit</a>',
         edit_url,
@@ -32,12 +37,11 @@ class BaseNodeTable(tables.Table):
 
     class Meta:
         model = NodeModel
-        template_name = "django_tables2/bootstrap4.html"
+        template_name = TEMPLATE_NAME
         fields = ("title", "content", "created_at", "updated_at", "actions")
 
     def render_title(self, record):
-        url = reverse(f'view_{record._meta.model_name}', args=[record.pk])
-        return mark_safe(f'<a href="{url}">{record.title}</a>')
+        return link_to_object_html(record)
 
     def render_tags(self, value):
         return ", ".join(str(tag) for tag in value.all())
@@ -67,5 +71,21 @@ class MemoTable(BaseNodeTable):
 class LinkTypeTable(tables.Table):
     class Meta:
         model = LinkType
-        template_name = "django_tables2/bootstrap4.html"
+        template_name = TEMPLATE_NAME
         fields = ("name", "reverse_name", "created_at", "updated_at")
+
+class LinkTable(tables.Table):
+    class Meta:
+        model = Link
+        template_name = TEMPLATE_NAME
+        fields = ("source", "link_type", "target", "created_at", "updated_at")
+
+    def render_source(self, record):
+        return link_to_object_html(record.source_content_object)
+
+    def render_target(self, record):
+        return link_to_object_html(record.target_content_object)
+
+
+    def render_link_type(self, record):
+        return record.link_type.name

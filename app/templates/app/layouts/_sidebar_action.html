@@ -1,12 +1,14 @@
 <nav id="sidebar" class="bg-secondary sidebar-secondary sidebar h-100" style="min-width: 55px; max-width: 55px;">
     <div class="text-center my-1">
         <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createInklingModal" title="New Inkling"><i class="bi bi-pen"></i></a>
-        <a href="{% url 'new_memo' %}" class="btn btn-primary m-1" title="New Memo"><i class="bi bi-journal-plus"></i></a>
+        <a href="{% url 'memo_create' %}" class="btn btn-primary m-1" title="New Memo"><i class="bi bi-journal-plus"></i></a>
         <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createLinkTypeModal" title="New Link Type"><i class="bi-node-plus"></i></a>
         <hr>
-        <a href="{% url 'inklings' %}" class="btn btn-primary m-1" title="New Memo"><i class="bi bi-droplet"></i></a>
-        <a href="{% url 'memos' %}" class="btn btn-primary m-1" title="New Memo"><i class="bi bi-journals"></i></a>
-        <a href="{% url 'references' %}" class="btn btn-primary m-1" title="New Memo"><i class="bi bi-book"></i>
+        <a href="{% url 'inklings' %}" class="btn btn-primary m-1" title="Inklings"><i class="bi bi-droplet"></i></a>
+        <a href="{% url 'memos' %}" class="btn btn-primary m-1" title="Memos"><i class="bi bi-journals"></i></a>
+        <a href="{% url 'references' %}" class="btn btn-primary m-1" title="References"><i class="bi bi-book"></i>
+        <a href="{% url 'links' %}" class="btn btn-primary m-1" title="Links"><i class="bi bi-link-45deg"></i>
+
         </a>
     </div>
 </nav>
@@ -19,7 +21,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="createInklingForm" method="post" action="{% url 'create_inkling' %}">
+                <form id="createInklingForm" method="post" action="{% url 'inkling_create' %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <input class="form-control mb-2" id="title" name="title"></input>
@@ -42,7 +44,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="createLinkTypeForm" method="post" action="{% url 'create_link_type' %}">
+                <form id="createLinkTypeForm" method="post" action="{% url 'link_type_create' %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <input type="text" class="form-control" id="name" name="name" required placeholder="Link Type Name">

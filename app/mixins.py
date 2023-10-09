@@ -1,11 +1,13 @@
 
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from pgvector.django import CosineDistance
 
 from app.embeddings import generate_embedding
 from app.prompting import ChatGPT, get_tags_and_title
 
-from .models import NodeModel
+from .models import (EmbeddableModel, NodeModel, TaggableModel,
+                     TitleAndContentModel)
 
 
 class GenerateTitleAndTagsMixin:
@@ -14,7 +16,7 @@ class GenerateTitleAndTagsMixin:
     def form_valid(self, form):
         object = form.save(commit=False)
         object.user = self.request.user # type: ignore
-        if not isinstance(object, NodeModel):
+        if not isinstance(object, TaggableModel) or not isinstance(object, TitleAndContentModel):
             return super().form_valid(self, form) # type: ignore
         title = None if object.title == "Untitled" else object.title
         if (not title) or (not object.tags.exists()):
@@ -27,7 +29,8 @@ class GenerateTitleAndTagsMixin:
             tags = ai_content['tags']
         else:
             tags = []
-        object.embedding = generate_embedding(f'{object.title}: {object.content}')
+        if isinstance(object, EmbeddableModel):
+            object.embedding = generate_embedding(f'{object.title}: {object.content}')
         object.save()  # Save to the database
         object.create_tags(tags)
         self.object = object
@@ -49,8 +52,6 @@ class LinkedContentMixin:
         context = super().get_context_data(**kwargs) # type: ignore
         if isinstance(self.object, NodeModel): # type: ignore
             context['linked_content'] = self.object.get_link_groups() # type: ignore
-            print(context['linked_content'])
-            print('test')
         return context
     
 

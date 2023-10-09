@@ -31,4 +31,4 @@ class DeleteReferenceView(SimilarObjectMixin, DeleteView, UserScopedMixin):
         similar_object = self.get_similar_object()
         if not similar_object:
             return reverse('home')
-        return reverse('view_reference', args=[similar_object.pk])
+        return reverse('reference_view', args=[similar_object.pk])

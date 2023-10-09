@@ -1,33 +1,36 @@
-<button class="btn" data-bs-toggle="modal" data-bs-target="#linkToModal{{inkling.pk}}">
+{% load custom_filters %}
+
+<button class="btn" data-bs-toggle="modal" data-bs-target="#linkToModal{{source_object|class_name}}{{source_object.pk}}">
 <i class="bi bi-node-plus-fill"></i>
 </button>
-<div class="modal fade" id="linkToModal{{inkling.pk}}" tabindex="-1" aria-labelledby="linkModalLabel" aria-hidden="true">
+<div class="modal fade" id="linkToModal{{source_object|class_name}}{{source_object.pk}}" tabindex="-1" aria-labelledby="linkModalLabel" aria-hidden="true">
 <div class="modal-dialog">
     <div class="modal-content">
     <div class="modal-header">
-        <h5 class="modal-title" id="linkModalLabel">Link Inklings</h5>
+        <h5 class="modal-title" id="linkModalLabel">New Link</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
-    <form action="{% url 'create_link' %}" method="post">
+    <form action="{% url 'link_create' %}" method="post">    
     <div class="modal-body">
         {% csrf_token %}
-        <input type="hidden" name="source_inkling_id" value="{{ current_inkling.pk }}">
-        <input type="hidden" name="target_inkling_id" value="{{ inkling.pk }}">              
-        <!-- Show the two inklings -->
+        <input type="hidden" name="source_content_type" value="{{ source_object|content_type_id }}">
+        <input type="hidden" name="source_object_id" value="{{ source_object.pk }}">
         <div class="card card-body">
-            {{ current_inkling.content }}
+            {{ source_object.title }}
         </div>
         <div>
-            <select id="linkType" name="linkType" class="form-control">
+            <select id="link_type" name="link_type" class="form-control">
             {% for link_type in link_types %}
             <option value="{{ link_type.pk }}">{{ link_type.name }}</option>
             <option value="{{ link_type.pk }}_reverse">{{ link_type.reverse_name }}</option>
             {% endfor %}
         </select>
         </div>
+        <input type="hidden" name="target_content_type" value="{{ target_object|content_type_id }}">
+        <input type="hidden" name="target_object_id" value="{{ target_object.pk }}">
         <div class="card card-body">
-            {{ inkling.content }}
+            {{ target_object.title }}
         </div>
     </div>
     <div class="modal-footer">

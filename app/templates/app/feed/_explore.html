@@ -1,5 +1,8 @@
+<div class="mb-2">
+    {% include 'tag/_list_span.html' with tags=related_tags %}
+</div>
 <div>
-    {% for object in feed_objects %}
-        {% include 'feed/_object.html' %}
+    {% for feed_member_object in feed_objects %}
+        {% include 'feed/_object.html' with feed_origin_object=object object=feed_member_object %}
     {% endfor %}
 </div>

@@ -11,7 +11,7 @@ from app.models import Memo
 class MemoCreateAndRedirectToEditView(View, LoginRequiredMixin):
     def get(self, request, *args, **kwargs):
         memo = Memo.objects.create(title='Untitled', content='', user=request.user)
-        return redirect(reverse('edit_memo', args=[memo.id])) # type: ignore
+        return redirect(reverse('memo_edit', args=[memo.id])) # type: ignore
 
 
 class MemoEditView(LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixin, UpdateView):
@@ -31,7 +31,7 @@ class DeleteMemoView(SimilarObjectMixin, DeleteView, UserScopedMixin):
         similar_object = self.get_similar_object()
         if not similar_object:
             return reverse('home')
-        return reverse('view_memo', args=[similar_object.pk])
+        return reverse('memo_view', args=[similar_object.pk])
 
 
 

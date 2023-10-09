@@ -21,7 +21,7 @@ class DeleteTagView(SimilarObjectMixin, DeleteView, UserScopedMixin):
         similar_tag = self.get_similar_object()
         if not similar_tag:
             return reverse('home')
-        return reverse('view_tag', args=[similar_tag.pk])
+        return reverse('tag_view', args=[similar_tag.pk])
 
 
 class UpdateTagView(LoginRequiredMixin, UpdateView):
@@ -36,7 +36,7 @@ class UpdateTagView(LoginRequiredMixin, UpdateView):
         return super().get_queryset().filter(user=self.request.user)
 
     def get_success_url(self):
-        return reverse_lazy('view_tag', args=[self.object.pk]) # type: ignore
+        return reverse_lazy('tag_view', args=[self.object.pk]) # type: ignore
     
     def form_invalid(self, form):
         # Redirect to home on invalid form submission
@@ -74,4 +74,4 @@ def merge_tags(request):
         current_tag.embedding = generate_embedding(new_name)
         current_tag.save()
 
-    return redirect('view_tag', current_tag.id)  # type: ignore
+    return redirect('tag_view', current_tag.id)  # type: ignore

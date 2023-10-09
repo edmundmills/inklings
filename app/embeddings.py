@@ -18,7 +18,9 @@ def generate_embedding(text):
     embedding = model.encode([text])[0]
     return embedding
 
-def sort_by_distance(embedding, objects):
+def sort_by_distance(embedding, objects: list):
+    if not objects:
+        return []
     to_sort = np.stack([o.embedding for o in objects], axis=0)
     distances = cos_sim(embedding, to_sort).tolist()[0] # type: ignore
     sorted_objects = sorted(zip(objects, distances), key=lambda t: -t[1])
@@ -45,6 +47,8 @@ def get_similar_objects(model: type[EmbeddableModel], embedding, user: User,
 def get_similar_tags(model: Union[EmbeddableModel, Query], user: User, limit: Optional[int] = None) -> models.QuerySet:
     if isinstance(model, TaggableModel):
         exclude_kwargs = {'pk__in': model.tags.all()}
+    elif isinstance(model, Tag):
+        exclude_kwargs = {'pk': model.pk}
     else:
         exclude_kwargs = dict()
     return get_similar_objects(Tag, model.embedding, user, exclude_kwargs, limit)
@@ -71,7 +75,7 @@ def get_similar_nodes_to_node(model: NodeModel, node_class: type[NodeModel], use
 
 
 def get_similar_to_tag(tag: Tag, model: type[EmbeddableModel], user: User, limit: Optional[int]) -> models.QuerySet:
-    if isinstance(model, TaggableModel):
+    if issubclass(model, TaggableModel):
         exclude_kwargs = {'tags': tag}
     else:
         exclude_kwargs = None

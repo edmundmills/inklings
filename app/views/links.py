@@ -1,21 +1,22 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms.models import BaseModelForm
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import CreateView, DeleteView
 
 from app.forms import LinkForm
 from app.mixins import RedirectBackMixin, SimilarObjectMixin, UserScopedMixin
-from app.models import Link
+from app.models import Inkling, Link, Memo, Reference
 
 
-class CreateLinkView(LoginRequiredMixin, CreateView, RedirectBackMixin):
+class CreateLinkView(LoginRequiredMixin, RedirectBackMixin, CreateView):
     form_class = LinkForm
-    template_name = 'path_to_link_create_template.html'
+    template_name = '/'
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        self.object = form.save()
-        # messages.success(self.request, "Link created successfully!")
-        return redirect(self.get_success_url())
+        return super().form_valid(form)
+
 
 
 class DeleteLinkView(DeleteView, UserScopedMixin, RedirectBackMixin, LoginRequiredMixin):

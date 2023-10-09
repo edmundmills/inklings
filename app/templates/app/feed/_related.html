@@ -5,3 +5,30 @@
     {{link_type.1}}
     {{linked}}
 {% endfor %}
+
+{% if object.memo_set.exists %}
+<h4>Inklings</h4>
+{% for inkling in object.inkling_set.all %}
+    <div class="mb-2">
+        {% include 'inkling/_card.html' %}
+    </div>
+{% endfor %}
+{% endif %}
+
+{% if object.memo_set.exists %}
+<h4>Memos</h4>
+{% for memo in object.memo_set.all %}
+<div class="mb-2">
+    {% include 'memo/_summary.html' %}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if object.memo_set.exists %}
+<h4>Records</h4>
+{% for record in object.record_set.all %}
+<div class="mb-2">
+    <!-- {% include 'memo/_summary.html' %} -->
+</div>
+{% endfor %}
+{% endif %}

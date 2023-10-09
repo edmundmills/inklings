@@ -35,7 +35,7 @@ class HomeView(ListView, LoginRequiredMixin, UserScopedMixin):
     def dispatch(self, request, *args, **kwargs):
         memos = Memo.objects.filter(user=self.request.user).order_by('-updated_at') 
         if memos.exists():
-            return redirect('view_memo', memos[0].pk)
+            return redirect('memo_view', memos[0].pk)
         return super().dispatch(request, *args, **kwargs)
 
 
