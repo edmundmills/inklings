@@ -71,17 +71,17 @@ class URLReferenceForm(forms.Form):
         }
     )
 
-    def clean_url(self):
-        url = self.cleaned_data.get('url')
+    # def clean_url(self):
+    #     url = self.cleaned_data.get('url')
         
-        try:
-            response = requests.head(url, timeout=5)  # Using a HEAD request for faster validation
-            if response.status_code != 200:
-                raise forms.ValidationError("The provided URL is not accessible.")
-        except requests.RequestException:
-            raise forms.ValidationError("Failed to validate the URL. Ensure it's correct and accessible.")
+    #     try:
+    #         response = requests.head(url, timeout=20)  # Using a HEAD request for faster validation
+    #         if response.status_code != 200:
+    #             raise forms.ValidationError("The provided URL is not accessible.")
+    #     except requests.RequestException:
+    #         raise forms.ValidationError("Failed to validate the URL. Ensure it's correct and accessible.")
 
-        return url
+    #     return url
 
 
 class LinkTypeForm(forms.ModelForm):

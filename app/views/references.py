@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
@@ -21,6 +21,10 @@ from app.prompting import ChatGPT
 class ReferenceCreateView(LoginRequiredMixin, CreateView):
     model = Reference
     form_class = URLReferenceForm
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return HttpResponseRedirect(self.request.META.get('HTTP_REFERER', reverse_lazy('/')))
 
     def form_valid(self, form):
         url = form.cleaned_data['url']

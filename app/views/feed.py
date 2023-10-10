@@ -4,7 +4,7 @@ from django.views.generic import DetailView
 from app.embeddings import (generate_embedding, get_similar_nodes,
                             get_similar_tags, sort_by_distance)
 from app.mixins import LinkedContentMixin, UserScopedMixin
-from app.models import Inkling, Memo, Query, Reference, Tag
+from app.models import Inkling, Link, Memo, Query, Reference, Tag
 
 
 class FeedContentMixin(LinkedContentMixin):
@@ -13,7 +13,7 @@ class FeedContentMixin(LinkedContentMixin):
         feed_objects = []
         object = self.object # type: ignore
         user = self.request.user # type: ignore
-        for search_class in [Reference, Inkling, Memo]:
+        for search_class in [Reference, Inkling, Memo, Link]:
             similar_nodes = get_similar_nodes(object, search_class, user, 10)
             feed_objects.extend(similar_nodes)
         feed_objects += get_similar_tags(object, user, 10)

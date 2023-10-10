@@ -30,7 +30,7 @@ class GenerateTitleAndTagsMixin:
         else:
             tags = []
         if isinstance(object, EmbeddableModel):
-            object.embedding = generate_embedding(f'{object.title}: {object.content}')
+            object.embedding = generate_embedding(object.content, object.title)
         object.save()  # Save to the database
         object.create_tags(tags)
         self.object = object

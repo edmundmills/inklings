@@ -18,26 +18,25 @@ def create_default_keywords(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Inkling)
 def generate_and_save_embedding_for_inkling(sender, instance, **kwargs):
     if instance.embedding is None:
-        instance.embedding = generate_embedding(f'{instance.title}: {instance.content}')
+        instance.embedding = generate_embedding(instance.content, instance.title)
         instance.save(update_fields=['embedding'])
 
 @receiver(post_save, sender=Link)
 def generate_and_save_embedding_for_link(sender, instance, **kwargs):
     if instance.embedding is None:
-        embeddings = (0.5 * generate_embedding(instance.link_type.name)) + (0.5 * generate_embedding(instance.link_type.reverse_name)) + instance.source_content_object + instance.target_content_object
-        instance.embedding = embeddings / 3
+        instance.embedding = (0.2 * generate_embedding(instance.link_type.name, instance.link_type.reverse_name)) + (0.4* instance.source_content_object.embedding) + (0.4 * instance.target_content_object.embedding)
         instance.save(update_fields=['embedding'])
 
 @receiver(post_save, sender=Memo)
 def generate_and_save_embedding_for_memo(sender, instance, **kwargs):
     if instance.embedding is None:
-        instance.embedding = generate_embedding(f'{instance.title}: {instance.content}')
+        instance.embedding = generate_embedding(instance.content, instance.title)
         instance.save(update_fields=['embedding'])
 
 @receiver(post_save, sender=Reference)
 def generate_and_save_embedding_for_reference(sender, instance, **kwargs):
     if instance.embedding is None:
-        instance.embedding = generate_embedding(f'{instance.title}: {instance.content}')
+        instance.embedding = generate_embedding(instance.content, instance.title)
         instance.save(update_fields=['embedding'])
 
 @receiver(post_save, sender=Tag)

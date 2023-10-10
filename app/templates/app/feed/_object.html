@@ -5,18 +5,41 @@
         <div class="d-flex flex-row">
             <div class="text-dark fs-5 text-info mx-1">
                 {% include 'components/_icon.html' with object=object %}
-            </div>            
+            </div>
+            {% if object|class_name == 'link' %}
+            <div>
+                <div>
+                    <a href="{% url object.source_content_object|class_name|add:'_view' object.source_content_object.pk %}">
+                        {{ object.source_content_object.title }}
+                    </a>
+                </div>
+                <div>
+                    {{ object.link_type.name }}
+                </div>
+                <div>
+                    <a href="{% url object.target_content_object|class_name|add:'_view' object.target_content_object.pk %}">
+                        {{ object.target_content_object.title }}
+                    </a>    
+                </div>
+            </div>
+            {% else %}
             <div class="flex-grow-1 mx-2 align-self-center">
                 <a href="{% url object|class_name|add:'_view' object.pk %}">
                     {{ object.title }}{{ object.name }}
                 </a>    
             </div>
             <div>
-                {% if show_link and not object.name %}
-                    {{ object.class_name }}
-                    {% include "feed/_link_button.html" with source_object=feed_origin_object target_object=object %}
+                {% if show_link %}
+                    {% if object|class_name == 'tag' %}
+                        {% if feed_origin_object|class_name != 'tag'%}
+                            {% include "feed/_link_button.html" with source_object=object target_object=feed_origin_object %}
+                        {% endif %}
+                    {% else %}
+                        {% include "feed/_link_button.html" with source_object=feed_origin_object target_object=object %}
+                    {% endif %}
                 {% endif %}
             </div>
+            {% endif %}
         </div>
         <div>
             {{ object.content|safe_markdown|truncatewords:50 }}
