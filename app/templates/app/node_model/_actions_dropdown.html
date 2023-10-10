@@ -5,6 +5,9 @@
         {% include 'node_model/_create_inkling.html' with object=object %}
       </li>
       <li>
+        {% include 'node_model/_add_tag.html' with object=object %}
+      </li>
+      <li>
         {% include 'node_model/_edit_link.html' with object=object %}
       </li>
       <li>
@@ -13,3 +16,4 @@
     </ul>
 </div>
 {% include 'node_model/_create_inkling_modal.html' with object=object %}
+{% include 'node_model/_add_tag_modal.html' with object=object %}

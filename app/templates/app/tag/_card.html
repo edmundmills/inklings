@@ -1,5 +1,12 @@
 <div class="card text-bg-white mb-2">
     <div class="card-body">
-        <h2>#{{ tag.name }}</h2>
+        <div class="d-flex flex-row">
+            <div class="flex-grow-1 mx-2 align-self-center">
+                <h2>#{{ tag.name }}</h2>
+            </div>
+            <div>
+                {% include 'tag/_actions.html' with tag=tag %}
+            </div>
+        </div>
     </div>
 </div>

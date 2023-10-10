@@ -16,7 +16,8 @@ class FeedContentMixin(LinkedContentMixin):
         for search_class in [Reference, Inkling, Memo]:
             similar_nodes = get_similar_nodes(object, search_class, user, 10)
             feed_objects.extend(similar_nodes)
-        feed_objects += get_similar_tags(object, user, 10)
+        context['similar_tags'] = get_similar_tags(object, user, 10)
+        feed_objects += context['similar_tags']
         feed_objects = sort_by_distance(object.embedding, feed_objects)
         context['feed_objects'] = feed_objects
         return context

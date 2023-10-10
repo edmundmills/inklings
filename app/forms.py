@@ -15,25 +15,32 @@ class SearchForm(forms.Form):
 
 
 class TagForm(forms.ModelForm):
-    class Meta:
-        model = Tag
-        fields = ['name']
-
-
-class AddTagForm(forms.Form):
     TAGGABLE_CLASSES = {
         "memo": Memo,
         "reference": Reference,
         "inkling": Inkling,
     }
 
-    tag_id = forms.IntegerField(widget=forms.HiddenInput())
-    target_class_name = forms.ChoiceField(choices=[(k, k) for k in TAGGABLE_CLASSES.keys()], widget=forms.HiddenInput())
-    target_id = forms.IntegerField(widget=forms.HiddenInput())
+    new_tag = forms.CharField(max_length=255, required=False)
+    target_class_name = forms.ChoiceField(choices=[(k, k) for k in TAGGABLE_CLASSES.keys()], widget=forms.HiddenInput(), required=False)
+    target_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
+    class Meta:
+        model = Tag
+        fields = ['name']
 
     def clean_target_class_name(self):
-        target_class_name = self.cleaned_data['target_class_name']
+        target_class_name = self.cleaned_data.get('target_class_name')
+        if not target_class_name:
+            return None
         return self.TAGGABLE_CLASSES[target_class_name]
+
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+        if cleaned_data['new_tag']:
+            cleaned_data['name'] = cleaned_data['new_tag']
+        return cleaned_data
+
 
 class MemoForm(forms.ModelForm):
     content = MartorFormField()

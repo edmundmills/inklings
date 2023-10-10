@@ -31,7 +31,8 @@
             <div>
                 {% if show_link and feed_origin_object|class_name != 'query' %}
                     {% if object|class_name == 'tag' %}
-                        {% if feed_origin_object|class_name != 'tag'%}
+                        {% if feed_origin_object|class_name == 'tag'%}
+                        {% else %}
                             {% include "feed/_link_button.html" with source_object=object target_object=feed_origin_object %}
                         {% endif %}
                     {% else %}

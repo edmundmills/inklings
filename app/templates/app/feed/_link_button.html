@@ -2,7 +2,7 @@
 {% if source_object|class_name == 'tag' %}
 <form action="{% url 'tag_add' %}" method="post">
     {% csrf_token %}
-    <input type="hidden" name="tag_id" value="{{ source_object.pk }}">
+    <input type="hidden" name="name" value="{{ source_object.name }}">
     <input type="hidden" name="target_class_name" value="{{ target_object|class_name }}">
     <input type="hidden" name="target_id" value="{{ target_object.pk }}">
     <button class="btn" type="submit">

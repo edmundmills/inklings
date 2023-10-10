@@ -8,6 +8,7 @@ from django.contrib.contenttypes.fields import (GenericForeignKey,
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.forms import ValidationError
+from django.urls import reverse
 from martor.models import MartorField
 from pgvector.django import VectorField
 
@@ -131,6 +132,8 @@ class Memo(TitleAndContentModel, NodeModel, SummarizableModel):
     class Meta:
         ordering = ['-created_at']
 
+    def get_absolute_url(self):
+        return reverse('memo_view', args=[str(self.pk)])
 
 class Reference(TitleAndContentModel, NodeModel, SummarizableModel):
     source_url = models.URLField(max_length=2000, blank=True, null=True)
@@ -141,10 +144,16 @@ class Reference(TitleAndContentModel, NodeModel, SummarizableModel):
     class Meta:
         ordering = ['-created_at']
 
+    def get_absolute_url(self):
+        return reverse('reference_view', args=[str(self.pk)])
+
 
 class Inkling(TitleAndContentModel, NodeModel):
     class Meta:
         ordering = ['-created_at']
+    
+    def get_absolute_url(self):
+        return reverse('inkling_view', args=[str(self.pk)])
 
 
 class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
@@ -164,6 +173,10 @@ class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
     @property
     def title(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('title_view', args=[str(self.pk)])
+
 
 @dataclass
 class Query:
