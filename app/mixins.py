@@ -11,15 +11,17 @@ from .models import (EmbeddableModel, NodeModel, SummarizableModel,
 
 
 def add_metadata(object: UserOwnedModel, completer: Completer):
-    if not isinstance(object, TaggableModel) or not isinstance(object, TitleAndContentModel) or not isinstance(object, SummarizableModel):
+    if not isinstance(object, TaggableModel) and not isinstance(object, TitleAndContentModel) and not isinstance(object, SummarizableModel):
         return object
     title = None if object.title == "Untitled" else object.title
     user_tags = object.user.tag_set.all() # type: ignore
     ai_content = get_generated_metadata(completer, object.content, title, user_tags)
-    if isinstance(object, TitleAndContentModel):
-        new_title = title if title else ai_content.get('title')
-        if new_title:
-            object.title = new_title
+    print(ai_content)
+    if isinstance(object, TitleAndContentModel) and not title:
+        new_title = ai_content.get('title')
+        if not new_title:
+            new_title = 'Untitled'
+        object.title = new_title
     if isinstance(object, SummarizableModel):
         summary = ai_content.get('summary')
         if summary:

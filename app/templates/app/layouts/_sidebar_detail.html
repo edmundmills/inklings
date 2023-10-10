@@ -16,7 +16,7 @@
         </div>
     {% endfor %}
     
-    {% if object.memo_set.exists %}
+    {% if object.inkling_set.exists %}
     <div class="mb-3">
         <h4>Inklings</h4>
         {% for inkling in object.inkling_set.all %}

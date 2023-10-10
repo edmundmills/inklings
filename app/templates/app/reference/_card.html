@@ -8,6 +8,7 @@
                     {{ reference.title }}
                 </a>        
             </div>
+            {% include 'node_model/_actions_dropdown.html' with object=reference %}
         </div>
         <div class="">
             {{ reference.summary|safe_markdown }}

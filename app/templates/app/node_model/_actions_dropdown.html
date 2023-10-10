@@ -1,0 +1,15 @@
+<div class="dropdown">
+    <button class="btn dropdown-toggle text-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+    <ul class="dropdown-menu">
+      <li>
+        {% include 'node_model/_create_inkling.html' with object=object %}
+      </li>
+      <li>
+        {% include 'node_model/_edit_link.html' with object=object %}
+      </li>
+      <li>
+        {% include 'node_model/_delete_form.html' with object=object %}
+      </li>
+    </ul>
+</div>
+{% include 'node_model/_create_inkling_modal.html' with object=object %}

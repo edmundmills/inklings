@@ -20,13 +20,16 @@ urlpatterns = [
     
     path('inklings/', views.InklingListView.as_view(), name='inklings'),
     path('inkling/<int:pk>/', views.InklingFeedView.as_view(), name='inkling_view'),
+    path('inkling/<int:pk>/edit/', views.EditInklingView.as_view(), name='inkling_edit'),
     path('inkling/<int:pk>/delete/', views.DeleteInklingView.as_view(), name='inkling_delete'),
     path('inklings/create/', views.CreateInklingView.as_view(), name='inkling_create'),
+    path('inklings/create_with_link/', views.create_inkling_and_link, name='inkling_create_and_link'),
     
     path('references/', views.ReferenceListView.as_view(), name='references'),
     path('references/create', views.ReferenceCreateView.as_view(), name='reference_create'),
     path('reference/<int:pk>/', views.ReferenceFeedView.as_view(), name='reference_view'),
-    path('reference/<int:pk>/delete', views.DeleteReferenceView.as_view(), name='reference_delete'),
+    path('reference/<int:pk>/edit/', views.EditReferenceView.as_view(), name='reference_edit'),
+    path('reference/<int:pk>/delete/', views.DeleteReferenceView.as_view(), name='reference_delete'),
 
     path('search/', views.QueryFeedView.as_view(), name='search'),
     

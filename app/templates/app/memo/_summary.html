@@ -8,6 +8,7 @@
                     {{ memo.title }}
                 </a>        
             </div>
+            {% include 'node_model/_actions_dropdown.html' with object=memo %}
         </div>
         <div class="">
             {{ memo.summary|safe_markdown }}
