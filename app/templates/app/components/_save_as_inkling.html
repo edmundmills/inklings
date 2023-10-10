@@ -1,0 +1,7 @@
+<div>
+    <form id="createInklingForm" method="post" action="{% url 'inkling_create' %}">
+        {% csrf_token %}
+        <input type="hidden" id="content" name="content" value="{{ content }}">
+        <button type="submit" class="dropdown-item">Save as Inkling</button>
+    </form>          
+</div>

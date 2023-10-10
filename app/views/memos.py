@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import DeleteView, UpdateView, View
 
 from app.mixins import (GenerateTitleAndTagsMixin, SimilarObjectMixin,
@@ -19,6 +19,8 @@ class MemoEditView(LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixi
     fields = ['title', 'content']
     template_name = 'memo/edit.html'
 
+    def get_success_url(self) -> str:
+        return reverse('memo_view', args=[self.object.pk]) # type: ignore
 
 class DeleteMemoView(SimilarObjectMixin, DeleteView, UserScopedMixin):
     model = Memo
