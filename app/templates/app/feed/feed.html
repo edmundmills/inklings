@@ -8,24 +8,10 @@
         <div class="mb-2">
             {% block feed_object %}{% endblock %}
         </div>
-        <ul class="nav nav-pills nav-pills nav-fill mb-2">
-            <li class="nav-item">
-                <a class="nav-link active" id="explore-tab" data-bs-toggle="pill" href="#explore">Explore</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="tags-related" data-bs-toggle="pill" href="#related">Related</a>
-            </li>
-        </ul>
         <div class="tab-content flex-grow-1" style="overflow-y: auto;">
-            <div class="tab-pane fade active show" id="explore">
-                {% include 'feed/_explore.html' %}
-            </div>
-            <div class="tab-pane fade" id="related">
-                {% include 'feed/_related.html' %}
-            </div>
+            {% include 'feed/_explore.html' %}
         </div>
     </div>
-    <div class="col-3">
-    </div>
+    {% include 'layouts/_sidebar_detail.html' %}
 </div>
 {% endblock %}
