@@ -5,7 +5,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import DeleteView, UpdateView
 
 from app.embeddings import generate_embedding
-from app.forms import TagForm
+from app.forms import AddTagForm, TagForm
 from app.mixins import SimilarObjectMixin, UserScopedMixin
 from app.models import Inkling, Memo, Tag
 
@@ -75,3 +75,16 @@ def merge_tags(request):
         current_tag.save()
 
     return redirect('tag_view', current_tag.id)  # type: ignore
+
+@login_required
+def add_tag(request):
+    if request.method != 'POST':
+        return redirect('/')
+    form = AddTagForm(request.POST)
+    if not form.is_valid():
+        return redirect('/')
+    tag = get_object_or_404(Tag, id=form.cleaned_data['tag_id'])
+    target_class = form.cleaned_data['target_class_name']
+    target_object = get_object_or_404(target_class, id=form.cleaned_data['target_id'])
+    target_object.tags.add(tag)
+    return redirect(reverse('tag_view', args=[tag.pk]))

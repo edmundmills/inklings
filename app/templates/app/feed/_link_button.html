@@ -1,5 +1,17 @@
 {% load custom_filters %}
-
+{% if source_object|class_name == 'tag' %}
+<form action="{% url 'tag_add' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="tag_id" value="{{ source_object.pk }}">
+    <input type="hidden" name="target_class_name" value="{{ target_object|class_name }}">
+    <input type="hidden" name="target_id" value="{{ target_object.pk }}">
+    <button class="btn" type="submit">
+        <i class="bi bi-node-plus-fill text-primary"></i>
+    </button>
+</form>   
+{% elif source_object|class_name == 'query' %}
+{% elif source_object|class_name == 'link' %}
+{% else %}
 <button class="btn" data-bs-toggle="modal" data-bs-target="#linkToModal{{source_object|class_name}}{{source_object.pk}}">
 <i class="bi bi-node-plus-fill text-primary"></i>
 </button>
@@ -41,3 +53,4 @@
     </div>
 </div>
 </div>      
+{% endif %}

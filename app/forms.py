@@ -1,3 +1,5 @@
+from typing import Any
+
 import requests
 from django import forms
 from martor.fields import MartorFormField
@@ -17,6 +19,21 @@ class TagForm(forms.ModelForm):
         model = Tag
         fields = ['name']
 
+
+class AddTagForm(forms.Form):
+    TAGGABLE_CLASSES = {
+        "memo": Memo,
+        "reference": Reference,
+        "inkling": Inkling,
+    }
+
+    tag_id = forms.IntegerField(widget=forms.HiddenInput())
+    target_class_name = forms.ChoiceField(choices=[(k, k) for k in TAGGABLE_CLASSES.keys()], widget=forms.HiddenInput())
+    target_id = forms.IntegerField(widget=forms.HiddenInput())
+
+    def clean_target_class_name(self):
+        target_class_name = self.cleaned_data['target_class_name']
+        return self.TAGGABLE_CLASSES[target_class_name]
 
 class MemoForm(forms.ModelForm):
     content = MartorFormField()
