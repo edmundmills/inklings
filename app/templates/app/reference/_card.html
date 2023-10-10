@@ -13,6 +13,10 @@
         <div class="">
             {{ reference.summary|safe_markdown }}
         </div>
+        <div class="mb-2">
+            {% include 'reference/_metadata_text.html' with reference=reference %}
+        </div>
+        {% include 'components/_hidden_markdown.html' with object=reference %}
     </div>
     <div class="card-footer">
         <span>

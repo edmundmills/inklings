@@ -1,0 +1,17 @@
+{% load martortags %}
+
+<div class="w-100 d-flex flex-row">
+    <a class="btn btn-outline-secondary flex-grow-1 mb-2" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        Full Content
+        </a>        
+</div>
+<div class="collapse" id="collapseExample">
+    <div style="overflow-x: hidden;">
+    {{ object.content|safe_markdown }}
+    </div>
+    <p class="w-100 d-flex flex-row">
+        <a class="btn btn-outline-secondary flex-grow-1" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        Hide Content
+        </a>
+    </p>    
+</div>

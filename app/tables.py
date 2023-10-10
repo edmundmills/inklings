@@ -38,15 +38,16 @@ class BaseNodeTable(tables.Table):
     class Meta:
         model = NodeModel
         template_name = TEMPLATE_NAME
+        fields = ("title", "tags", "links")
 
     def render_title(self, record):
         return link_to_object_html(record)
 
     def render_tags(self, value):
-        return ", ".join(str(tag) for tag in value.all())
+        return mark_safe(", ".join(link_to_object_html(tag) for tag in value.all()))
 
     def render_links(self, record):
-        return ", ".join(str(link) for link in record.all_links())
+        return mark_safe(", ".join(link_to_object_html(other) for other in record.all_linked_objects()))
     
     def render_actions(self, record):
         csrf_token = get_token(self.context['request']) # type: ignore
@@ -86,7 +87,6 @@ class LinkTable(tables.Table):
 
     def render_target(self, record):
         return link_to_object_html(record.target_content_object)
-
 
     def render_link_type(self, record):
         return record.link_type.name

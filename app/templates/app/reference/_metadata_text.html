@@ -1,0 +1,12 @@
+{% if reference.publication_date %}
+Date: {{ reference.publication_date}}<br>
+{% endif %}
+{% if reference.source_name %}
+Source: {{ reference.source_name}}<br>
+{% endif %}
+{% if reference.authors %}
+Author: {{ reference.authors}}<br>
+{% endif %}
+{% if reference.source_url %}
+<a href='{{ reference.source_url }}'>{{ reference.source_url|truncatechars:70 }}</a><br>
+{% endif %}

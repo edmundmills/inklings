@@ -84,6 +84,15 @@ class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel
             models.Q(target_content_type=content_type, target_object_id=self.pk)
         ).select_related('link_type')
 
+    def all_linked_objects(self) -> list['NodeModel']:
+        objects = []
+        for link in self.all_links():
+            if link.target_content_object == self:
+                objects.append(link.source_content_object)
+            else:
+                objects.append(link.target_content_object)
+        return objects
+
     def get_link_groups(self) -> dict[tuple[LinkType, str], list['NodeModel']]:
         link_groups = defaultdict(list)
         for link in self.all_links():
@@ -150,6 +159,10 @@ class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
         ordering = ['name']
 
     def __str__(self):
+        return self.name
+
+    @property
+    def title(self):
         return self.name
 
 @dataclass

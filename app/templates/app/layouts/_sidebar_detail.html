@@ -4,7 +4,7 @@
     </div>
     
     {% for link_type_and_direction, linked in linked_content.items %}
-        <div>
+        <div class="mb-2">
             {% if link_type_and_direction.1 == 'outgoing' %}
                 <h5>{{link_type_and_direction.0.name}}</h5>
             {% else %}

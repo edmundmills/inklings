@@ -13,6 +13,7 @@
         <div class="">
             {{ memo.summary|safe_markdown }}
         </div>
+        {% include 'components/_hidden_markdown.html' with object=memo %}
     </div>
     <div class="card-footer">
         <span>
