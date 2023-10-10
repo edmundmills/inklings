@@ -35,6 +35,13 @@ class TitleAndContentModel(models.Model):
         abstract = True
 
 
+class SummarizableModel(models.Model):
+    summary = models.CharField(max_length=1024)
+
+    class Meta:
+        abstract = True
+
+
 class LinkType(UserOwnedModel, TimeStampedModel):
     name = models.CharField(max_length=255)
     reverse_name = models.CharField(max_length=255, default='')
@@ -45,7 +52,7 @@ class LinkType(UserOwnedModel, TimeStampedModel):
 
 
 class EmbeddableModel(models.Model):
-    embedding = VectorField(dimensions=768, null=True)
+    embedding = VectorField(dimensions=384, null=True)
 
     class Meta:
         abstract = True
@@ -111,12 +118,12 @@ class Link(NodeModel):
 
 
 
-class Memo(TitleAndContentModel, NodeModel):
+class Memo(TitleAndContentModel, NodeModel, SummarizableModel):
     class Meta:
         ordering = ['-created_at']
 
 
-class Reference(TitleAndContentModel, NodeModel):
+class Reference(TitleAndContentModel, NodeModel, SummarizableModel):
     source_url = models.URLField(max_length=2000, blank=True, null=True)
     source_name = models.CharField(max_length=255, blank=True, null=True)
     publication_date = models.DateField(blank=True, null=True)

@@ -38,7 +38,6 @@ class BaseNodeTable(tables.Table):
     class Meta:
         model = NodeModel
         template_name = TEMPLATE_NAME
-        fields = ("title", "content", "created_at", "updated_at", "actions")
 
     def render_title(self, record):
         return link_to_object_html(record)
@@ -58,15 +57,17 @@ class BaseNodeTable(tables.Table):
 class ReferenceTable(BaseNodeTable):
     class Meta(BaseNodeTable.Meta):
         model = Reference
-        fields = BaseNodeTable.Meta.fields + ("source_url", "source_name", "publication_date", "authors")
+        fields = ("title", "summary", "source_url", "source_name", "publication_date", "authors", "created_at", "updated_at", "actions")
 
 class InklingTable(BaseNodeTable):
     class Meta(BaseNodeTable.Meta):
         model = Inkling
+        fields = ("title", "content", "created_at", "updated_at", "actions")
 
 class MemoTable(BaseNodeTable):
     class Meta(BaseNodeTable.Meta):
         model = Memo
+        fields = ("title", "summary", "created_at", "updated_at", "actions")
 
 class LinkTypeTable(tables.Table):
     class Meta:

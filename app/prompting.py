@@ -40,16 +40,20 @@ class ChatGPT(Completer):
 
 
 
-def get_tags_and_title(completer: Completer, text: str, title: Optional[str], existing_tags: list[str]) -> dict:
-    format_instructions = '{"tags": ["tag_1", "tag_2", ...], "title": "generated_title"}'
-    system_prompt = f"""You are a helpful assistant who provides tags, given a text. Create tags that address the intention of the text and its major themes. Strike a good balance between general and specific, creating keywords that will be relevant for other texts. Do not simply copy the terms from the text.
+def get_generated_metadata(completer: Completer, text: str, title: Optional[str], existing_tags: list[str]) -> dict:
+    format_instructions = '{"tags": ["tag_1", "tag_2", ...], "title": "generated_title", "summary": "summary_text"}'
+    system_prompt = f"""You are a helpful assistant who provides tags, a title, and a short summary, given a text.
+
+Create tags that address the intention of the text and its major themes. Strike a good balance between general and specific, creating keywords that will be relevant for other texts. Do not simply copy the terms from the text.
 
 You have a list of existing tags. If an existing tag applies to the text, return it as one of the tags you provide. You may also create additional keywords that highlight aspects of the text that are not covered by the list of existing tags. Here are the existing tags: {[str(t) for t in existing_tags]}
 
 Give 3-7 tags. Do not give more than 7 tags.
 
-You also provide an appropriate title, if the existing title is None."""
-    prompt = f"<h1>{title}</h1>\n{text}"
+You also provide an appropriate title, if the existing title is None.
+
+Give a short summary. The summary should be a short paragraph, of no more than three sentences."""
+    prompt = f"<h1>{title}</h1>\n{text[:5000]}"
     return completer(Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=prompt))
 
 

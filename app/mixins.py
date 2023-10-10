@@ -4,10 +4,33 @@ from django.urls import reverse_lazy
 from pgvector.django import CosineDistance
 
 from app.embeddings import generate_embedding
-from app.prompting import ChatGPT, get_tags_and_title
+from app.prompting import ChatGPT, Completer, get_generated_metadata
 
-from .models import (EmbeddableModel, NodeModel, TaggableModel,
-                     TitleAndContentModel)
+from .models import (EmbeddableModel, NodeModel, SummarizableModel,
+                     TaggableModel, TitleAndContentModel, UserOwnedModel)
+
+
+def add_metadata(object: UserOwnedModel, completer: Completer):
+    if not isinstance(object, TaggableModel) or not isinstance(object, TitleAndContentModel) or not isinstance(object, SummarizableModel):
+        return object
+    title = None if object.title == "Untitled" else object.title
+    user_tags = object.user.tag_set.all() # type: ignore
+    ai_content = get_generated_metadata(completer, object.content, title, user_tags)
+    if isinstance(object, TitleAndContentModel):
+        new_title = title if title else ai_content.get('title')
+        if new_title:
+            object.title = new_title
+    if isinstance(object, SummarizableModel):
+        summary = ai_content.get('summary')
+        if summary:
+            object.summary = summary
+    if isinstance(object, EmbeddableModel):
+        object.embedding = generate_embedding(object.content, object.title)
+    object.save()
+    if isinstance(object, TaggableModel):
+        tags = ai_content.get('tags', list())
+        object.create_tags(tags)
+    return object
 
 
 class GenerateTitleAndTagsMixin:
@@ -16,23 +39,7 @@ class GenerateTitleAndTagsMixin:
     def form_valid(self, form):
         object = form.save(commit=False)
         object.user = self.request.user # type: ignore
-        if not isinstance(object, TaggableModel) or not isinstance(object, TitleAndContentModel):
-            return super().form_valid(self, form) # type: ignore
-        title = None if object.title == "Untitled" else object.title
-        if (not title) or (not object.tags.exists()):
-            user_tags = self.request.user.tag_set.all() # type: ignore
-            ai_content = get_tags_and_title(self.completer, object.content, title, user_tags)
-            if not title:
-                title = ai_content.get('title')
-            if title:
-                object.title = title
-            tags = ai_content['tags']
-        else:
-            tags = []
-        if isinstance(object, EmbeddableModel):
-            object.embedding = generate_embedding(object.content, object.title)
-        object.save()  # Save to the database
-        object.create_tags(tags)
+        object = add_metadata(object, self.completer)
         self.object = object
         return redirect(self.get_success_url()) # type: ignore
 

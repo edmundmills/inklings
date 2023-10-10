@@ -29,7 +29,7 @@
                 </a>    
             </div>
             <div>
-                {% if show_link %}
+                {% if show_link and feed_origin_object|class_name != 'query' %}
                     {% if object|class_name == 'tag' %}
                         {% if feed_origin_object|class_name != 'tag'%}
                             {% include "feed/_link_button.html" with source_object=object target_object=feed_origin_object %}
@@ -42,7 +42,11 @@
             {% endif %}
         </div>
         <div>
-            {{ object.content|safe_markdown|truncatewords:50 }}
+            {% if object|class_name == 'inkling' %}
+                {{ object.content|safe_markdown|truncatewords:50 }}
+                {% else %}
+                {{ object.summary }}
+            {% endif %}
         </div>
     </div>
 </div>

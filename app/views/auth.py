@@ -25,7 +25,7 @@ def signup_view(request):
     return render(request, 'auth/signup.html', {'form': form})
 
 
-class HomeView(ListView, LoginRequiredMixin, UserScopedMixin):
+class HomeView(UserScopedMixin, LoginRequiredMixin, ListView):
     model = Memo
     template_name = 'layouts/home.html'
     

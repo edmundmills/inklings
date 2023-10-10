@@ -13,7 +13,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
 from app.fetch_reference import create_reference_from_url
 from app.forms import URLReferenceForm
 from app.mixins import (GenerateTitleAndTagsMixin, SimilarObjectMixin,
-                        UserScopedMixin)
+                        UserScopedMixin, add_metadata)
 from app.models import Reference
 from app.prompting import ChatGPT
 
@@ -21,6 +21,7 @@ from app.prompting import ChatGPT
 class ReferenceCreateView(LoginRequiredMixin, CreateView):
     model = Reference
     form_class = URLReferenceForm
+    completer = ChatGPT()
 
     def form_invalid(self, form):
         print(form.errors)
@@ -29,6 +30,7 @@ class ReferenceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         url = form.cleaned_data['url']
         self.object = create_reference_from_url(url, ChatGPT(), self.request.user)
+        self.object = add_metadata(self.object, self.completer)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_form_kwargs(self):
