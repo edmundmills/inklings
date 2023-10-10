@@ -22,7 +22,7 @@ def signup_view(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'auth/signup.html', {'form': form})
 
 
 class HomeView(ListView, LoginRequiredMixin, UserScopedMixin):
