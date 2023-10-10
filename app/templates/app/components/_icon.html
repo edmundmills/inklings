@@ -1,0 +1,13 @@
+{% load custom_filters %}
+
+{% if object|class_name == 'memo' %}
+    <i class="bi bi-journal"></i>
+{% elif object|class_name == 'inkling' %}
+    <i class="bi bi-droplet"></i>
+{% elif object|class_name == 'reference' %}
+    <i class="bi bi-book"></i>
+{% elif object|class_name == 'link' %}
+    <i class="bi bi-link-45deg"></i>
+{% elif object|class_name == 'tag' %}
+    <i class="bi bi-tag"></i>
+{% endif %}

@@ -1,0 +1,13 @@
+{% load custom_filters %}
+{% load martortags %}
+
+<li class="d-flex flex-row">
+    <div class="text-dark text-info mx-1">
+        {% include 'components/_icon.html' with object=object %}
+    </div>            
+    <div class="flex-grow-1 align-self-center">
+        <a href="{% url object|class_name|add:'_view' object.pk %}">
+            {{ object.title }}{{ object.name }}
+        </a>    
+    </div>
+</li>

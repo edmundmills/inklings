@@ -1,0 +1,21 @@
+{% load martortags %}
+
+<div class="card border-dark bg-white">
+    <div class="card-body">
+        <div class="d-flex flex-row pb-1">
+            <div class="flex-grow-1">
+                <a href="{% url 'reference_view' reference.id %}">
+                    {{ reference.title }}
+                </a>        
+            </div>
+        </div>
+        <div class="border bg-light collapse collapse-content p-1" id="memoCollapse" type="button" data-bs-toggle="collapse" data-bs-target="#memoCollapse" aria-expanded="false" aria-controls="memoCollapse">
+            {{ reference.content|safe_markdown }}
+        </div>
+    </div>
+    <div class="card-footer">
+        <span>
+            {% include 'tag/_list_span.html' with tags=reference.tags.all %}
+        </span>
+    </div>
+</div>

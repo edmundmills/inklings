@@ -40,7 +40,7 @@ class LinkForm(forms.ModelForm):
             cleaned_data['source_object_id'], cleaned_data['target_object_id'] = cleaned_data['target_object_id'], cleaned_data['source_object_id']
             cleaned_data['source_content_type'], cleaned_data['target_content_type'] = cleaned_data['target_content_type'], cleaned_data['source_content_type']
             cleaned_data['link_type'] = link_type_id.removesuffix('_reverse')
-        cleaned_data['link_type'] = LinkType.objects.get(pk=int(link_type_id))
+        cleaned_data['link_type'] = LinkType.objects.get(pk=int(cleaned_data['link_type']))
         return cleaned_data
 
 

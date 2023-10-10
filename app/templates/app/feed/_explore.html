@@ -3,6 +3,6 @@
 </div>
 <div>
     {% for feed_member_object in feed_objects %}
-        {% include 'feed/_object.html' with feed_origin_object=object object=feed_member_object %}
+        {% include 'feed/_object.html' with feed_origin_object=object object=feed_member_object show_link=True %}
     {% endfor %}
 </div>
