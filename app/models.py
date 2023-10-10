@@ -44,25 +44,6 @@ class LinkType(UserOwnedModel, TimeStampedModel):
         ordering = ['name']
 
 
-class Link(UserOwnedModel, TimeStampedModel):
-    # Source generic foreign key fields
-    source_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="source_links")
-    source_object_id = models.PositiveIntegerField()
-    source_content_object = GenericForeignKey('source_content_type', 'source_object_id')
-
-    # Target generic foreign key fields
-    target_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="target_links")
-    target_object_id = models.PositiveIntegerField()
-    target_content_object = GenericForeignKey('target_content_type', 'target_object_id')
-
-    link_type = models.ForeignKey(LinkType, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        unique_together = ['source_content_type', 'source_object_id', 'target_content_type', 'target_object_id', 'link_type']
-        ordering = ['link_type']
-
 class EmbeddableModel(models.Model):
     embedding = VectorField(dimensions=768, null=True)
 
@@ -86,8 +67,8 @@ class TaggableModel(UserOwnedModel):
 
 
 class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel):
-    source_links = GenericRelation(Link, content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
-    target_links = GenericRelation(Link, content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
+    source_links = GenericRelation('Link', content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
+    target_links = GenericRelation('Link', content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
 
     def all_links(self):
         content_type = ContentType.objects.get_for_model(self)
@@ -107,6 +88,27 @@ class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel
 
     class Meta:
         abstract = True
+
+
+class Link(NodeModel):
+    # Source generic foreign key fields
+    source_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="source_links")
+    source_object_id = models.PositiveIntegerField()
+    source_content_object = GenericForeignKey('source_content_type', 'source_object_id')
+
+    # Target generic foreign key fields
+    target_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="target_links")
+    target_object_id = models.PositiveIntegerField()
+    target_content_object = GenericForeignKey('target_content_type', 'target_object_id')
+
+    link_type = models.ForeignKey(LinkType, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['source_content_type', 'source_object_id', 'target_content_type', 'target_object_id', 'link_type']
+        ordering = ['link_type']
+
 
 
 class Memo(TitleAndContentModel, NodeModel):
