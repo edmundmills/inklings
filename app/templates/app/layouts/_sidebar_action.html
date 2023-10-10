@@ -3,12 +3,13 @@
         <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createInklingModal" title="New Inkling"><i class="bi bi-pen"></i></a>
         <a href="{% url 'memo_create' %}" class="btn btn-primary m-1" title="New Memo"><i class="bi bi-journal-plus"></i></a>
         <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createReferenceModal" title="New Reference"><i class="bi-bookmark-plus"></i></a>
-        <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createLinkTypeModal" title="New Link Type"><i class="bi-node-plus"></i></a>
         <hr>
         <a href="{% url 'inklings' %}" class="btn btn-primary m-1" title="Inklings"><i class="bi bi-droplet"></i></a>
         <a href="{% url 'memos' %}" class="btn btn-primary m-1" title="Memos"><i class="bi bi-journals"></i></a>
         <a href="{% url 'references' %}" class="btn btn-primary m-1" title="References"><i class="bi bi-book"></i>
         <a href="{% url 'links' %}" class="btn btn-primary m-1" title="Links"><i class="bi bi-link-45deg"></i>
+        <a class="btn btn-primary m-1" href="{% url 'link_types' %}" title="Link Types"><i class="bi bi-bezier2"></i>
+        </a>
 
         </a>
     </div>
@@ -60,28 +61,3 @@
         </div>
     </div>
 </div>    
-<div class="modal fade" id="createLinkTypeModal" tabindex="-1" aria-labelledby="createLinkTypeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createLinkTypeModalLabel">New Link Type</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createLinkTypeForm" method="post" action="{% url 'link_type_create' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <input type="text" class="form-control" id="name" name="name" required placeholder="Link Type Name">
-                    </div>
-                    <div class="mb-3">
-                        <input type="text" class="form-control" id="reverse_name" name="reverse_name" required placeholder="Link Type Name - Reverse Direction">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Create</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
