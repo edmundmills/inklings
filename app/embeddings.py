@@ -20,11 +20,11 @@ MODEL = None
 def load_model():
     global MODEL
     if MODEL is None:
-        MODEL = SentenceTransformer('paraphrase-albert-small-v2')
+        MODEL = SentenceTransformer('all-MiniLM-L6-v2')
     return MODEL
 
 
-def chunk_text(text: str, max_length: int = 512, overlap: int = 50) -> list[str]:
+def chunk_text(text: str, max_length: int = 200, overlap: int = 25) -> list[str]:
     """
     Splits the text into smaller chunks of at most max_length tokens with an overlap.
     """
