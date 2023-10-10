@@ -13,7 +13,7 @@ class FeedContentMixin(LinkedContentMixin):
         feed_objects = []
         object = self.object # type: ignore
         user = self.request.user # type: ignore
-        for search_class in [Reference, Inkling, Memo, Link]:
+        for search_class in [Reference, Inkling, Memo]:
             similar_nodes = get_similar_nodes(object, search_class, user, 10)
             feed_objects.extend(similar_nodes)
         feed_objects += get_similar_tags(object, user, 10)
