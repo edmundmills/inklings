@@ -1,3 +1,4 @@
+import uuid
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional
@@ -424,3 +425,26 @@ class FriendRequest(TimeStampedModel):
 class Query:
     query: str
     embedding: np.ndarray
+
+
+class UserInvite(models.Model):
+    # Status Choices
+    PENDING = 'pending'
+    ACCEPTED = 'accepted'
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (ACCEPTED, 'Accepted'),
+    ]
+
+    # Fields
+    inviter = models.ForeignKey(User, related_name='sent_invites', on_delete=models.CASCADE)
+    email = models.EmailField()
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Generates a unique UUID for every invite
+    date_created = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
+
+    def __str__(self):
+        return f"Invite for {self.email} by {self.inviter.username}"
+
+    class Meta:
+        unique_together = ['inviter', 'email']
