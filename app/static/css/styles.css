@@ -4,20 +4,51 @@
 }
 
 
-.footer-fixed {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+
+:root {
+    --white: #FEFAE0;
+    --light: #FAEDCD;
+    --primary: #D4A373;
+    --gray: #dee2e6;
 }
 
-.collapse-content.collapse {
-    max-height: 7em;
-    overflow: hidden;
-    display: block;
+.tab-martor-menu .nav-tabs {
+    border-bottom: #FAEDCD !important;
+    padding-bottom: 0.375rem;
 }
 
-.collapse-content.show {
-    max-height: none;
+
+.martor-field {
+    background-color: var(--white) !important;
+    border: 1px solid var(--gray) !important;
+    border-radius: 0.25rem;
+}
+
+
+.martor-field.ace_focus {
+    outline: 0;
+    color: var(--bs-body-color) !important;
+    background-color: var(--bs-body-bg) !important;
+    border-color: #ead1b9 !important;
+    box-shadow:0 0 0 .25rem rgba(212,163,115,.25) !important;
+}
+
+.ace_scroller {
+    left: 0px !important;
+}
+
+.ace_gutter {
+    display: none !important;
+}
+
+.ace_active-line {
+    background: var(--white) !important;
+}
+
+.martor-preview {
+    background-color: var(--light) !important;
+}
+
+div.martor-preview-stale {
+    background: none !important;
 }
