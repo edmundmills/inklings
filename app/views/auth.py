@@ -46,12 +46,3 @@ def get_intention(request):
             LinkType.objects.create(name=forward_name, reverse_name=reverse_name, user=request.user)
         return redirect('home')
     return render(request, 'auth/intentions_form.html')
-
-
-@login_required
-def home_view(request):
-    tag = request.user.tag_set.all().first()
-    if tag:
-        return redirect(tag.get_absolute_url())
-    return redirect('memo_create')
-

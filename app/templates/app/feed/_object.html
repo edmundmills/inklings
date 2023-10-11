@@ -29,7 +29,7 @@
                 </a>    
             </div>
             <div>
-                {% if show_link and feed_origin_object|class_name != 'query' %}
+                {% if show_link and feed_origin_object and feed_origin_object|class_name != 'query' %}
                     {% if object|class_name == 'tag' %}
                         {% if feed_origin_object|class_name == 'tag'%}
                         {% else %}
