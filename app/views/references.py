@@ -12,7 +12,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
 
 from app.fetch_reference import create_reference_from_url
 from app.forms import URLReferenceForm
-from app.mixins import (GenerateTitleAndTagsMixin, SimilarObjectMixin,
+from app.mixins import (GenerateTitleAndTagsMixin, RedirectBackMixin,
                         UserScopedMixin, add_metadata)
 from app.models import Reference
 from app.prompting import ChatGPT
@@ -48,15 +48,6 @@ class EditReferenceView(LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTag
     template_name = 'reference/edit.html'
 
 
-class DeleteReferenceView(SimilarObjectMixin, DeleteView, UserScopedMixin):
+class DeleteReferenceView(RedirectBackMixin, UserScopedMixin, LoginRequiredMixin, DeleteView):
     model = Reference
     success_url = '/'
-        
-    def get_success_url(self):
-        """
-        Redirect to the most similar tag after deletion.
-        """
-        similar_object = self.get_similar_object()
-        if not similar_object:
-            return reverse('home')
-        return reverse('reference_view', args=[similar_object.pk])

@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DeleteView, UpdateView, View
 
-from app.mixins import (GenerateTitleAndTagsMixin, SimilarObjectMixin,
+from app.mixins import (GenerateTitleAndTagsMixin, RedirectBackMixin,
                         UserScopedMixin)
 from app.models import Memo
 
@@ -22,18 +22,11 @@ class MemoEditView(LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixi
     def get_success_url(self) -> str:
         return reverse('memo_view', args=[self.object.pk]) # type: ignore
 
-class DeleteMemoView(SimilarObjectMixin, DeleteView, UserScopedMixin):
+
+class DeleteMemoView(RedirectBackMixin, LoginRequiredMixin, UserScopedMixin, DeleteView):
     model = Memo
     success_url = '/'
         
-    def get_success_url(self):
-        """
-        Redirect to the most similar tag after deletion.
-        """
-        similar_object = self.get_similar_object()
-        if not similar_object:
-            return reverse('home')
-        return reverse('memo_view', args=[similar_object.pk])
 
 
 

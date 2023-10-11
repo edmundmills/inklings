@@ -6,22 +6,13 @@ from django.views.generic import DeleteView, UpdateView
 
 from app.embeddings import generate_embedding
 from app.forms import TagForm
-from app.mixins import SimilarObjectMixin, UserScopedMixin
+from app.mixins import RedirectBackMixin, UserScopedMixin
 from app.models import Inkling, Memo, Tag
 
 
-class DeleteTagView(SimilarObjectMixin, DeleteView, UserScopedMixin):
+class DeleteTagView(LoginRequiredMixin, RedirectBackMixin, UserScopedMixin, DeleteView):
     model = Tag
     success_url = '/'
-        
-    def get_success_url(self):
-        """
-        Redirect to the most similar tag after deletion.
-        """
-        similar_tag = self.get_similar_object()
-        if not similar_tag:
-            return reverse('home')
-        return reverse('tag_view', args=[similar_tag.pk])
 
 
 class UpdateTagView(LoginRequiredMixin, UpdateView):

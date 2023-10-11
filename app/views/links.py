@@ -1,12 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms.models import BaseModelForm
-from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.views.generic import CreateView, DeleteView
 
 from app.forms import LinkForm
-from app.mixins import RedirectBackMixin, SimilarObjectMixin, UserScopedMixin
-from app.models import Inkling, Link, Memo, Reference
+from app.mixins import RedirectBackMixin, UserScopedMixin
+from app.models import Link
 
 
 class CreateLinkView(LoginRequiredMixin, RedirectBackMixin, CreateView):

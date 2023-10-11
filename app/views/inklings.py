@@ -10,7 +10,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView, View)
 
 from app.forms import InklingForm, LinkForm
-from app.mixins import (GenerateTitleAndTagsMixin, SimilarObjectMixin,
+from app.mixins import (GenerateTitleAndTagsMixin, RedirectBackMixin,
                         UserScopedMixin, add_metadata)
 from app.models import ContentType, Inkling, Link
 from app.prompting import ChatGPT
@@ -29,17 +29,9 @@ class EditInklingView(UserScopedMixin, LoginRequiredMixin, UpdateView):
     form_class = InklingForm
 
 
-class DeleteInklingView(SimilarObjectMixin, UserScopedMixin, DeleteView):
+class DeleteInklingView(LoginRequiredMixin, RedirectBackMixin, UserScopedMixin, DeleteView):
     model = Inkling
 
-    def get_success_url(self):
-        """
-        Redirect to the most similar object after deletion.
-        """
-        similar_object = self.get_similar_object()
-        if not similar_object:
-            return reverse('home')
-        return reverse('inkling_view', args=[similar_object.pk])
 
 @login_required
 def create_inkling_and_link(request):

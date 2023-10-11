@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
+from typing import Optional
 
 import numpy as np
 from django.contrib.auth.models import User
@@ -10,7 +11,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 from martor.models import MartorField
-from pgvector.django import VectorField
+from pgvector.django import CosineDistance, VectorField
 
 
 class UserOwnedModel(models.Model):
@@ -139,12 +140,42 @@ class LinkType(UserOwnedModel, TimeStampedModel):
         unique_together = ['user', 'name']
         ordering = ['name']
 
+    @classmethod
+    def get_list_url(cls):
+        return reverse('link_type_list')
 
 class EmbeddableModel(models.Model):
     embedding = VectorField(dimensions=384, null=True)
 
     class Meta:
         abstract = True
+
+    @classmethod
+    def get_similar_objects(cls, embedding, user: User, 
+                            exclude_filter: Optional[Q] = None,
+                            limit: Optional[int] = None,
+                            filter_theshold: float = 0.7,
+                            privacy_level: str = 'own') -> models.QuerySet:
+
+        queryset = (cls.objects
+                    .alias(distance=CosineDistance('embedding', embedding))
+                    .filter(distance__lt=filter_theshold)
+                    .order_by('distance'))
+    
+        if issubclass(cls, PrivacySettingsModel):
+            privacy_filter = cls.get_combined_filter(user, privacy_level)
+        else:
+            privacy_filter = Q(user=user)
+        queryset = queryset.filter(privacy_filter)
+
+        
+        if exclude_filter is not None:
+            queryset = queryset.exclude(exclude_filter)
+            
+        if limit:
+            queryset = queryset[:limit]
+            
+        return queryset
 
 
 class TaggableModel(UserOwnedModel):
@@ -165,6 +196,9 @@ class TaggableModel(UserOwnedModel):
 class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel):
     source_links = GenericRelation('Link', content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
     target_links = GenericRelation('Link', content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
+
+    class Meta:
+        abstract = True
 
     def all_links(self):
         content_type = ContentType.objects.get_for_model(self)
@@ -191,8 +225,23 @@ class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel
             link_groups[key].append(target)
         return dict(link_groups)
 
-    class Meta:
-        abstract = True
+    def related_nodes_filter(self, other_model_class: type['NodeModel']) -> Q:
+        other_model_content_type = ContentType.objects.get_for_model(other_model_class)
+        model_content_type = ContentType.objects.get_for_model(self)
+
+        exclude_conditions = Q()
+
+        exclude_conditions |= Q(source_links__source_content_type=other_model_content_type)
+        exclude_conditions |= Q(target_links__target_content_type=other_model_content_type)
+
+        if other_model_class == Link:
+            exclude_conditions |= Q(source_content_type=model_content_type, source_object_id=self.pk)
+            exclude_conditions |= Q(target_content_type=model_content_type, target_object_id=self.pk)
+        
+        if isinstance(self, other_model_class):
+            exclude_conditions |= Q(pk=self.pk)
+        
+        return exclude_conditions    
 
 
 class Link(NodeModel):
@@ -214,14 +263,30 @@ class Link(NodeModel):
         unique_together = ['source_content_type', 'source_object_id', 'target_content_type', 'target_object_id', 'link_type']
         ordering = ['link_type']
 
+    def related_nodes_filter(self, other_model_class: type[NodeModel]) -> Q:
+        exclude_conditions = super().related_nodes_filter(other_model_class)
+        if isinstance(self.source_content_object, other_model_class):
+            exclude_conditions |= Q(pk=self.source_object_id)
+        if isinstance(self.target_content_object, other_model_class):
+            exclude_conditions |= Q(pk=self.target_object_id)
+        return exclude_conditions
+
+    @classmethod
+    def get_list_url(cls):
+        return reverse('link_list')
 
 
 class Memo(TitleAndContentModel, NodeModel, SummarizableModel, PrivacySettingsModel):
     class Meta:
         ordering = ['-created_at']
 
+    @classmethod
+    def get_list_url(cls):
+        return reverse('memo_list')
+
     def get_absolute_url(self):
         return reverse('memo_view', args=[str(self.pk)])
+
 
 class Reference(TitleAndContentModel, NodeModel, SummarizableModel, PrivacySettingsModel):
     source_url = models.URLField(max_length=2000, blank=True, null=True)
@@ -235,6 +300,10 @@ class Reference(TitleAndContentModel, NodeModel, SummarizableModel, PrivacySetti
     def get_absolute_url(self):
         return reverse('reference_view', args=[str(self.pk)])
 
+    @classmethod
+    def get_list_url(cls):
+        return reverse('reference_list')
+
 
 class Inkling(TitleAndContentModel, NodeModel, PrivacySettingsModel):
     class Meta:
@@ -243,6 +312,9 @@ class Inkling(TitleAndContentModel, NodeModel, PrivacySettingsModel):
     def get_absolute_url(self):
         return reverse('inkling_view', args=[str(self.pk)])
 
+    @classmethod
+    def get_list_url(cls):
+        return reverse('inkling_list')
 
 class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
     name = models.CharField(max_length=50)

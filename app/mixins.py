@@ -13,9 +13,9 @@ from .models import (EmbeddableModel, NodeModel, SummarizableModel,
 def add_metadata(object: UserOwnedModel, completer: Completer):
     if not isinstance(object, TaggableModel) and not isinstance(object, TitleAndContentModel) and not isinstance(object, SummarizableModel):
         return object
-    title = None if object.title == "Untitled" else object.title
+    title = None if object.title == "Untitled" else object.title # type: ignore
     user_tags = object.user.tag_set.all() # type: ignore
-    ai_content = get_generated_metadata(completer, object.content, title, user_tags)
+    ai_content = get_generated_metadata(completer, object.content, title, user_tags) # type: ignore
     print(ai_content)
     if isinstance(object, TitleAndContentModel) and not title:
         new_title = ai_content.get('title')
@@ -27,7 +27,7 @@ def add_metadata(object: UserOwnedModel, completer: Completer):
         if summary:
             object.summary = summary
     if isinstance(object, EmbeddableModel):
-        object.embedding = generate_embedding(object.content, object.title)
+        object.embedding = generate_embedding(object.content, object.title) # type: ignore
     object.save()
     if isinstance(object, TaggableModel):
         tags = ai_content.get('tags', list())
@@ -48,6 +48,10 @@ class GenerateTitleAndTagsMixin:
 
 class RedirectBackMixin:
     def get_success_url(self):
+        # if this request came from an object's detail view and deleted the object, redirect to the list view page for the object class
+        if self.request.META.get('HTTP_REFERER', '').startswith(self.request.build_absolute_uri(self.object.get_absolute_url())): # type: ignore
+            return self.model.get_list_url() # type: ignore
+        # otherwise redirect back
         return self.request.META.get('HTTP_REFERER', reverse_lazy('/')) # type: ignore
 
 
@@ -63,15 +67,4 @@ class LinkedContentMixin:
             context['linked_content'] = self.object.get_link_groups() # type: ignore
         return context
     
-
-class SimilarObjectMixin:    
-    def get_similar_object(self):
-        """
-        Returns the most similar object based on the embedding.
-        """
-        object = self.get_object() # type: ignore
-        if not isinstance(object, NodeModel):
-            return None
-        embedding = object.embedding
-        return self.model.objects.filter(user=self.request.user).alias(distance=CosineDistance('embedding', embedding)).exclude(pk=object.pk).filter(distance__lt=0.5).order_by('distance').first() # type: ignore
 
