@@ -49,7 +49,7 @@ def extract_info_with_gpt(completer, html_content):
     system_prompt = f"""Given an HTML content, extract the following information: title, publication date, authors, and source name. You must give the publication_date in the provided format."""
     prompt = f"{html_content}"
 
-    return completer(Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=prompt))
+    return completer(Prompt(format_instructions=format_instructions, system_prompt=system_prompt, user_prompt=prompt).messages)
 
 
 def create_reference_from_url(url, completer, user):
