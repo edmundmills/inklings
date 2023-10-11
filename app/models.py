@@ -37,6 +37,7 @@ class PrivacySettingsModel(UserOwnedModel):
     class Meta:
         abstract = True
 
+
     def is_viewable_by(self, user):
         """
         Determine if a model instance is viewable by the given user based on privacy settings.
@@ -69,22 +70,23 @@ class PrivacySettingsModel(UserOwnedModel):
 
         return False
 
+
     @classmethod
-    def get_own_objects_filter(cls, user) -> Q:
+    def _get_own_objects_filter(cls, user) -> Q:
         """
         Return a Q object representing objects that are owned by the given user.
         """
         return Q(user=user)
 
     @classmethod
-    def get_friends_objects_filter(cls, user) -> Q:
+    def _get_friends_objects_filter(cls, user) -> Q:
         """
         Return a Q object representing objects owned by the friends of the given user.
         """
         return Q(privacy_setting=cls.FRIENDS, user__userprofile__friends=user)
 
     @classmethod
-    def get_friends_of_friends_objects_filter(cls, user) -> Q:
+    def _get_friends_of_friends_objects_filter(cls, user) -> Q:
         """
         Return a Q object representing objects owned by the friends of friends of the given user.
         """
@@ -92,7 +94,7 @@ class PrivacySettingsModel(UserOwnedModel):
         return Q(privacy_setting=cls.FRIENDS_OF_FRIENDS, user__userprofile__friends__in=user_friends) & ~Q(user__in=user_friends)
 
     @classmethod
-    def get_combined_filter(cls, user, level) -> Q:
+    def get_privacy_filter(cls, user, level) -> Q:
         """
         Return a combined Q object based on the level:
         - 'own': Just the user's objects.
@@ -100,11 +102,11 @@ class PrivacySettingsModel(UserOwnedModel):
         - 'fof': User's, friends', and friends of friends' objects.
         """
         if level == 'own':
-            return cls.get_own_objects_filter(user)
+            return cls._get_own_objects_filter(user)
         elif level == 'friends':
-            return cls.get_own_objects_filter(user) | cls.get_friends_objects_filter(user)
+            return cls._get_own_objects_filter(user) | cls._get_friends_objects_filter(user)
         elif level == 'fof':
-            return cls.get_own_objects_filter(user) | cls.get_friends_objects_filter(user) | cls.get_friends_of_friends_objects_filter(user)
+            return cls._get_own_objects_filter(user) | cls._get_friends_objects_filter(user) | cls._get_friends_of_friends_objects_filter(user)
         else:
             raise ValueError("Invalid level provided.")
 
@@ -144,6 +146,7 @@ class LinkType(UserOwnedModel, TimeStampedModel):
     def get_list_url(cls):
         return reverse('link_types')
 
+
 class EmbeddableModel(models.Model):
     embedding = VectorField(dimensions=384, null=True)
 
@@ -163,7 +166,7 @@ class EmbeddableModel(models.Model):
                     .order_by('distance'))
     
         if issubclass(cls, PrivacySettingsModel):
-            privacy_filter = cls.get_combined_filter(user, privacy_level)
+            privacy_filter = cls.get_privacy_filter(user, privacy_level)
         else:
             privacy_filter = Q(user=user)
         queryset = queryset.filter(privacy_filter)
@@ -193,7 +196,7 @@ class TaggableModel(UserOwnedModel):
         abstract = True
 
 
-class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel):
+class NodeModel(EmbeddableModel, TaggableModel, PrivacySettingsModel, TimeStampedModel):
     source_links = GenericRelation('Link', content_type_field='source_content_type', object_id_field='source_object_id', related_query_name='source')
     target_links = GenericRelation('Link', content_type_field='target_content_type', object_id_field='target_object_id', related_query_name='target')
 
@@ -244,7 +247,7 @@ class NodeModel(EmbeddableModel, TaggableModel, UserOwnedModel, TimeStampedModel
         return exclude_conditions    
 
 
-class Link(NodeModel):
+class Link(NodeModel, PrivacySettingsModel):
     # Source generic foreign key fields
     source_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="source_links")
     source_object_id = models.PositiveIntegerField()
@@ -256,9 +259,8 @@ class Link(NodeModel):
     target_content_object = GenericForeignKey('target_content_type', 'target_object_id')
 
     link_type = models.ForeignKey(LinkType, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
+
+
     class Meta:
         unique_together = ['source_content_type', 'source_object_id', 'target_content_type', 'target_object_id', 'link_type']
         ordering = ['link_type']
@@ -274,6 +276,32 @@ class Link(NodeModel):
     @classmethod
     def get_list_url(cls):
         return reverse('links')
+
+    def is_viewable_by(self, user: User, privacy_level: str = 'fof') -> bool:
+        return self.source_content_object.is_viewable_by(user, privacy_level) and self.target_content_object.is_viewable_by(user, privacy_level) # type: ignore
+
+    @classmethod
+    def get_privacy_filter(cls, user: User, privacy_level: str = 'fof') -> Q:
+        """
+        Returns a QuerySet of Link objects that are viewable by the specified user.
+        A Link is viewable if both its source and target nodes are viewable by the user.
+        """
+
+        # Get content types for all NodeModels
+        node_content_types = ContentType.objects.filter(app_label='app', model__in=['memo', 'reference', 'inkling'])
+
+        # Generate Q objects for each content type based on viewability
+        combined_filters = Q()
+        for content_type in node_content_types:
+            node_model = content_type.model_class()
+            if issubclass(node_model, PrivacySettingsModel): # type: ignore
+                model_filter = node_model.get_privacy_filter(user, privacy_level)
+                combined_filters |= Q(source_content_type=content_type, source_object_id__in=node_model.objects.filter(model_filter)) & \
+                                    Q(target_content_type=content_type, target_object_id__in=node_model.objects.filter(model_filter))
+        
+        return combined_filters
+
+
 
 
 class Memo(TitleAndContentModel, NodeModel, SummarizableModel, PrivacySettingsModel):
@@ -315,6 +343,7 @@ class Inkling(TitleAndContentModel, NodeModel, PrivacySettingsModel):
     @classmethod
     def get_list_url(cls):
         return reverse('inklings')
+
 
 class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
     name = models.CharField(max_length=50)
