@@ -3,18 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .embeddings import generate_embedding
-from .models import Inkling, Link, LinkType, Memo, Reference, Tag, UserProfile
-
-
-@receiver(post_save, sender=User)
-def create_default_keywords(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.userprofile.save()
+from .models import Inkling, Link, LinkType, Memo, Reference, Tag
 
 
 @receiver(post_save, sender=Inkling)

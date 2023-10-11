@@ -2,6 +2,8 @@ from typing import Any
 
 import requests
 from django import forms
+from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
+from django.contrib.auth.models import User
 from martor.fields import MartorFormField
 
 from .models import ContentType, Inkling, Link, LinkType, Memo, Reference, Tag
@@ -48,6 +50,21 @@ class MemoForm(forms.ModelForm):
     class Meta:
         model = Memo
         fields = ['title', 'content']
+
+
+class UserCreationForm(BaseUserCreationForm):
+    email = forms.EmailField(required=True, help_text="Required. Enter a valid email address.")
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "password1", "password2")
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+        return user
 
 
 class LinkForm(forms.ModelForm):

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 import numpy as np
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import (GenericForeignKey,
                                                 GenericRelation)
 from django.contrib.contenttypes.models import ContentType
@@ -13,6 +13,58 @@ from django.db.models import Q
 from django.urls import reverse
 from martor.models import MartorField
 from pgvector.django import CosineDistance, VectorField
+
+
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class User(AbstractUser, TimeStampedModel):
+    email = models.EmailField(unique=True)
+    friends = models.ManyToManyField('self', blank=True, symmetrical=True)
+    intention = models.TextField(blank=True, null=True)
+    intention_embedding = VectorField(dimensions=384, null=True)
+    received_friend_requests = models.ManyToManyField('self', through='FriendRequest', blank=True, symmetrical=False, related_name="received_requests")
+
+    def send_friend_request(self, receiver):
+        if not self.has_sent_request_to(receiver) and not self.is_friends_with(receiver):
+            FriendRequest.objects.create(sender=self, receiver=receiver)
+
+    def accept_friend_request(self, sender):
+        if sender.has_sent_request_to(self):
+            self.friends.add(sender)
+            sender.friends.add(self)
+            FriendRequest.objects.filter(sender=sender, receiver=self).delete()
+
+    def reject_friend_request(self, sender):
+        FriendRequest.objects.filter(sender=sender, receiver=self).delete()
+
+    def remove_friend(self, friend):
+        self.friends.remove(friend)
+
+    def is_friends_with(self, friend):
+        return friend in self.friends.all()
+
+    def has_sent_request_to(self, receiver):
+        return FriendRequest.objects.filter(sender=self, receiver=receiver).exists()
+
+
+
+class FriendRequest(TimeStampedModel):
+    sender = models.ForeignKey(User, related_name="sent_requests", on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name="incoming_requests", on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = ['sender', 'receiver']
+
+    @classmethod
+    def has_request_from_to(cls, sender, receiver):
+        return cls.objects.filter(sender=sender, receiver=receiver).exists()
+
 
 
 class UserOwnedModel(models.Model):
@@ -53,17 +105,17 @@ class PrivacySettingsModel(UserOwnedModel):
 
         # If privacy is set to friends, check if the given user is a friend of the owner
         if self.privacy_setting == self.FRIENDS:
-            return user.userprofile.is_friends_with(self.user.user_profile) # type: ignore
+            return user.is_friends_with(self.user) # type: ignore
 
         # If privacy is set to friends of friends, check the relationship accordingly
         if self.privacy_setting == self.FRIENDS_OF_FRIENDS:
             # Direct friends
-            if user.userprofile.is_friends_with(self.user.user_profile):  # type: ignore
+            if user.is_friends_with(self.user):  # type: ignore
                 return True
             
             # Friends of friends
-            user_friends = user.user_profile.friends.all()
-            owner_friends = self.user.user_profile.friends.all() # type: ignore
+            user_friends = user.friends.all()
+            owner_friends = self.user.friends.all() # type: ignore
             
             # Intersection checks for mutual friends
             mutual_friends = set(user_friends).intersection(owner_friends)
@@ -84,15 +136,15 @@ class PrivacySettingsModel(UserOwnedModel):
         """
         Return a Q object representing objects owned by the friends of the given user.
         """
-        return Q(privacy_setting=cls.FRIENDS, user__userprofile__friends=user)
+        return Q(privacy_setting=cls.FRIENDS, user__friends=user)
 
     @classmethod
     def _get_friends_of_friends_objects_filter(cls, user) -> Q:
         """
         Return a Q object representing objects owned by the friends of friends of the given user.
         """
-        user_friends = user.userprofile.friends.all()
-        return Q(privacy_setting=cls.FRIENDS_OF_FRIENDS, user__userprofile__friends__in=user_friends) & ~Q(user__in=user_friends)
+        user_friends = user.friends.all()
+        return Q(privacy_setting=cls.FRIENDS_OF_FRIENDS, user__friends__in=user_friends) & ~Q(user__in=user_friends)
 
     @classmethod
     def get_privacy_filter(cls, user, level) -> Q:
@@ -111,13 +163,6 @@ class PrivacySettingsModel(UserOwnedModel):
         else:
             raise ValueError("Invalid level provided.")
 
-
-class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
 
 
 class TitleAndContentModel(models.Model):
@@ -370,55 +415,6 @@ class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
     @classmethod
     def get_list_url(cls):
         return reverse('tags')
-
-
-
-class UserProfile(TimeStampedModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_profile")
-    friends = models.ManyToManyField('self', blank=True, symmetrical=True)
-    intention = models.TextField(blank=True, null=True)
-    received_friend_requests = models.ManyToManyField('self', through='FriendRequest', blank=True, symmetrical=False, related_name="received_requests")
-
-    def send_friend_request(self, receiver_profile):
-        if not self.has_sent_request_to(receiver_profile) and not self.is_friends_with(receiver_profile):
-            FriendRequest.objects.create(sender=self, receiver=receiver_profile)
-
-    def accept_friend_request(self, sender_profile):
-        if sender_profile.has_sent_request_to(self):
-            self.friends.add(sender_profile)
-            sender_profile.friends.add(self)
-            FriendRequest.objects.filter(sender=sender_profile, receiver=self).delete()
-
-    def reject_friend_request(self, sender_profile):
-        FriendRequest.objects.filter(sender=sender_profile, receiver=self).delete()
-
-    def remove_friend(self, friend_profile):
-        self.friends.remove(friend_profile)
-
-    def is_friends_with(self, friend_profile):
-        return friend_profile in self.friends.all()
-
-    def has_sent_request_to(self, receiver_profile):
-        return FriendRequest.objects.filter(sender=self, receiver=receiver_profile).exists()
-
-@property
-def user_profile(self):
-    return self.user_profile
-
-User.user_profile = user_profile # type: ignore
-
-
-class FriendRequest(TimeStampedModel):
-    sender = models.ForeignKey(UserProfile, related_name="sent_requests", on_delete=models.CASCADE)
-    receiver = models.ForeignKey(UserProfile, related_name="incoming_requests", on_delete=models.CASCADE)
-    
-    class Meta:
-        unique_together = ['sender', 'receiver']
-
-    @classmethod
-    def has_request_from_to(cls, sender_profile, receiver_profile):
-        return cls.objects.filter(sender=sender_profile, receiver=receiver_profile).exists()
-
 
 
 @dataclass
