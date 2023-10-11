@@ -83,6 +83,8 @@ def add_tag(request):
         return redirect('/')
     tag, _created = Tag.objects.get_or_create(name=form.cleaned_data['name'], user=request.user)
     target_class = form.cleaned_data['target_class_name']
-    target_object = get_object_or_404(target_class, id=form.cleaned_data['target_id'])
-    target_object.tags.add(tag)
-    return redirect(target_object.get_absolute_url())
+    if target_class is not None:
+        target_object = get_object_or_404(target_class, id=form.cleaned_data['target_id'])
+        target_object.tags.add(tag)
+        return redirect(target_object.get_absolute_url())
+    return redirect(tag.get_absolute_url())

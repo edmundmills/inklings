@@ -20,7 +20,7 @@ MODEL = None
 def load_model():
     global MODEL
     if MODEL is None:
-        MODEL = SentenceTransformer('all-MiniLM-L6-v2')
+        MODEL = SentenceTransformer('all-MiniLM-L12-v2')
     return MODEL
 
 

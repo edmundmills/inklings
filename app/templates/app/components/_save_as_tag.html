@@ -1,0 +1,7 @@
+<div>
+    <form id="createTagForm" method="post" action="{% url 'tag_add' %}">
+        {% csrf_token %}
+        <input type="hidden" id="name" name="name" value="{{ name }}">
+        <button type="submit" class="dropdown-item">Save as Tag</button>
+    </form>          
+</div>

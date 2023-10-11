@@ -175,7 +175,7 @@ class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('title_view', args=[str(self.pk)])
+        return reverse('tag_view', args=[str(self.pk)])
 
 
 @dataclass
