@@ -5,10 +5,11 @@ from django.urls import include, path
 from app import views
 
 urlpatterns = [
-    path('', views.HomeView.as_view(), name='home'),
+    path('', views.home_view, name='home'),
     
     path('admin/', admin.site.urls),
     path('accounts/signup/', views.signup_view, name='signup'),
+    path('accounts/intention/', views.get_intention, name='get_intention'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='auth/login.html', next_page='home'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 

@@ -9,8 +9,10 @@ from django.views.decorators.http import require_POST
 from django.views.generic import (CreateView, DetailView, ListView, UpdateView,
                                   View)
 
+from app.config import DEFAULT_LINK_TYPES, DEFAULT_TAGS
 from app.mixins import UserScopedMixin
-from app.models import Memo
+from app.models import LinkType, Memo, Tag, UserProfile
+from app.prompting import ChatGPT, create_initial_data
 
 
 def signup_view(request):
@@ -19,23 +21,37 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')
+            return redirect('get_intention')
     else:
         form = UserCreationForm()
     return render(request, 'auth/signup.html', {'form': form})
 
+@login_required
+def get_intention(request):
+    if request.method == 'POST':
+        intention = request.POST.get('intention')
+        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile.intention = intention
+        user_profile.save()
+        initial_data = create_initial_data(ChatGPT(), intention, DEFAULT_TAGS, DEFAULT_LINK_TYPES)
+        tags = initial_data.get('tags')
+        if not tags:
+            tags = DEFAULT_TAGS
+        link_types = initial_data.get('link_types')
+        if not link_types:
+            link_types = DEFAULT_LINK_TYPES
+        for tag_name in tags:
+            Tag.objects.create(name=tag_name, user=request.user)
+        for forward_name, reverse_name in link_types:
+            LinkType.objects.create(name=forward_name, reverse_name=reverse_name, user=request.user)
+        return redirect('home')
+    return render(request, 'auth/intentions_form.html')
 
-class HomeView(UserScopedMixin, LoginRequiredMixin, ListView):
-    model = Memo
-    template_name = 'layouts/home.html'
-    
-    def get_queryset(self):
-        return Memo.objects.filter(user=self.request.user).order_by('-created_at')
 
-    def dispatch(self, request, *args, **kwargs):
-        memos = Memo.objects.filter(user=self.request.user).order_by('-updated_at') 
-        if memos.exists():
-            return redirect('memo_view', memos[0].pk)
-        return super().dispatch(request, *args, **kwargs)
-
+@login_required
+def home_view(request):
+    tag = request.user.tag_set.all().first()
+    if tag:
+        return redirect(tag.get_absolute_url())
+    return redirect('memo_create')
 

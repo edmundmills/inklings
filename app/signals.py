@@ -2,18 +2,20 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .config import DEFAULT_LINK_TYPES, DEFAULT_TAGS
 from .embeddings import generate_embedding
-from .models import Inkling, Link, LinkType, Memo, Reference, Tag
+from .models import Inkling, Link, LinkType, Memo, Reference, Tag, UserProfile
 
 
 @receiver(post_save, sender=User)
 def create_default_keywords(sender, instance, created, **kwargs):
     if created:
-        for tag_name in DEFAULT_TAGS:
-            Tag.objects.create(name=tag_name, user=instance)
-        for forward_name, reverse_name in DEFAULT_LINK_TYPES:
-            LinkType.objects.create(name=forward_name, reverse_name=reverse_name, user=instance)
+        UserProfile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.userprofile.save()
+
 
 @receiver(post_save, sender=Inkling)
 def generate_and_save_embedding_for_inkling(sender, instance, **kwargs):

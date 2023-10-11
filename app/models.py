@@ -178,6 +178,12 @@ class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
         return reverse('tag_view', args=[str(self.pk)])
 
 
+
+class UserProfile(TimeStampedModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    intention = models.TextField(blank=True, null=True)
+
+
 @dataclass
 class Query:
     query: str

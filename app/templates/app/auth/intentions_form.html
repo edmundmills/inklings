@@ -1,0 +1,14 @@
+{% extends 'layouts/small_form.html' %}
+
+{% block title %}Inkling - Sign Up{% endblock %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    <label for="intention"><p>What is your main intention for using this app? What kind of information are you interested in exploring?</p><p>Your answer will be used to set up your Inkling vault.</p></label>
+    <textarea name="intention" class="form-control mb-2" required rows="5"></textarea>
+    <input type="submit" class="btn btn-primary" value="Submit">
+</form>
+
+{% endblock %}
