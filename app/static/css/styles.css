@@ -66,6 +66,10 @@
     background-color: var(--light) !important;
 }
 
-div.martor-preview-stale {
+.martor-preview-stale {
     background: none !important;
+}
+
+.expand-editor {
+    display: none !important;
 }
