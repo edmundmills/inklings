@@ -4,7 +4,7 @@
 {% block layout %}
 <div class="d-flex flex-row px-0 h-100 bg-light">
     {% include "layouts/_sidebar_action.html" %}
-    <div class="flex-grow-1 p-3">
+    <div class="flex-grow-1 p-3 h-100" style="overflow-y: auto;">
         <div class="pb-2">
             <form method="get">
                 <input type="text" name="search" placeholder="Search..." class="form-control">

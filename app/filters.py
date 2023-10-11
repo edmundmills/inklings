@@ -1,7 +1,7 @@
 import django_filters
 from django.db import models
 
-from .models import Inkling, Link, LinkType, Memo, Reference
+from .models import Inkling, Link, LinkType, Memo, Reference, Tag
 
 
 class BaseNodeFilter(django_filters.FilterSet):
@@ -55,3 +55,10 @@ class LinkFilter(django_filters.FilterSet):
             models.Q(target_content_object__title__icontains=value)
         )
         return queryset.filter(lookups)
+    
+class TagFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        model = Tag
+        fields = ['name']

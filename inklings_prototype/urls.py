@@ -46,6 +46,7 @@ urlpatterns = [
     path('tag/<int:pk>/', views.TagFeedView.as_view(), name='tag_view'),
     path('tag/<int:pk>/delete/', views.DeleteTagView.as_view(), name='tag_delete'),
     path('tag/<int:pk>/edit/', views.UpdateTagView.as_view(), name='tag_update'),
+    path('tags/', views.TagListView.as_view(), name='tags'),
     path('tags/add/', views.add_tag, name='tag_add'),
     path('tags/merge/', views.merge_tags, name='tags_merge'),
 

@@ -142,7 +142,7 @@ class LinkType(UserOwnedModel, TimeStampedModel):
 
     @classmethod
     def get_list_url(cls):
-        return reverse('link_type_list')
+        return reverse('link_types')
 
 class EmbeddableModel(models.Model):
     embedding = VectorField(dimensions=384, null=True)
@@ -273,7 +273,7 @@ class Link(NodeModel):
 
     @classmethod
     def get_list_url(cls):
-        return reverse('link_list')
+        return reverse('links')
 
 
 class Memo(TitleAndContentModel, NodeModel, SummarizableModel, PrivacySettingsModel):
@@ -282,7 +282,7 @@ class Memo(TitleAndContentModel, NodeModel, SummarizableModel, PrivacySettingsMo
 
     @classmethod
     def get_list_url(cls):
-        return reverse('memo_list')
+        return reverse('memos')
 
     def get_absolute_url(self):
         return reverse('memo_view', args=[str(self.pk)])
@@ -302,7 +302,7 @@ class Reference(TitleAndContentModel, NodeModel, SummarizableModel, PrivacySetti
 
     @classmethod
     def get_list_url(cls):
-        return reverse('reference_list')
+        return reverse('references')
 
 
 class Inkling(TitleAndContentModel, NodeModel, PrivacySettingsModel):
@@ -314,7 +314,7 @@ class Inkling(TitleAndContentModel, NodeModel, PrivacySettingsModel):
 
     @classmethod
     def get_list_url(cls):
-        return reverse('inkling_list')
+        return reverse('inklings')
 
 class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
     name = models.CharField(max_length=50)
@@ -336,6 +336,10 @@ class Tag(EmbeddableModel, UserOwnedModel, TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse('tag_view', args=[str(self.pk)])
+    
+    @classmethod
+    def get_list_url(cls):
+        return reverse('tags')
 
 
 

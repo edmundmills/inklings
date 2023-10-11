@@ -2,10 +2,10 @@ from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
 from app.filters import (InklingFilter, LinkFilter, LinkTypeFilter, MemoFilter,
-                         ReferenceFilter)
-from app.models import Inkling, Link, LinkType, Memo, Reference
+                         ReferenceFilter, TagFilter)
+from app.models import Inkling, Link, LinkType, Memo, Reference, Tag
 from app.tables import (InklingTable, LinkTable, LinkTypeTable, MemoTable,
-                        ReferenceTable)
+                        ReferenceTable, TagTable)
 
 
 class BaseNodeListView(SingleTableMixin, FilterView):
@@ -43,6 +43,16 @@ class LinkListView(SingleTableMixin, FilterView):
     model = Link
     table_class = LinkTable
     filterset_class = LinkFilter
+    template_name = "layouts/base_list_view.html"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+
+class TagListView(SingleTableMixin, FilterView):
+    model = Tag
+    table_class = TagTable
+    filterset_class = TagFilter
     template_name = "layouts/base_list_view.html"
 
     def get_queryset(self):

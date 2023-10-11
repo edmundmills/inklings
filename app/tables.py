@@ -3,7 +3,7 @@ from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.utils.html import format_html, mark_safe  # type: ignore
 
-from .models import Inkling, Link, LinkType, Memo, NodeModel, Reference
+from .models import Inkling, Link, LinkType, Memo, NodeModel, Reference, Tag
 
 TEMPLATE_NAME = "django_tables2/bootstrap5.html"
 
@@ -90,3 +90,16 @@ class LinkTable(tables.Table):
 
     def render_link_type(self, record):
         return record.link_type.name
+
+
+class TagTable(tables.Table):
+    actions = tables.Column(empty_values=(), orderable=False, verbose_name='Actions')
+
+    class Meta:
+        model = Tag
+        template_name = TEMPLATE_NAME
+        fields = ("name", "created_at", "updated_at")
+
+    def render_actions(self, record):
+        csrf_token = get_token(self.context['request']) # type: ignore
+        return delete_action_html(record, csrf_token)
