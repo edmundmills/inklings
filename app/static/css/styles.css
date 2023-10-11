@@ -10,6 +10,7 @@
     --light: #FAEDCD;
     --primary: #D4A373;
     --gray: #dee2e6;
+    --dark: #3A606E;
 }
 
 .tab-martor-menu .nav-tabs {
@@ -17,6 +18,22 @@
     padding-bottom: 0.375rem;
 }
 
+.tab-martor-menu .nav-link {
+    color: var(--dark) !important;
+    margin-bottom: 0.375rem;
+    margin-right: 0.375rem;
+}
+
+.tab-martor-menu .btn-toolbar {
+    margin-top: 0.375rem !important;
+}
+
+.tab-martor-menu .nav-link.active {
+    background-color: var(--primary) !important;
+    border-radius: 0.5rem;
+    border: none !important;
+    color: var(--light) !important;
+}
 
 .martor-field {
     background-color: var(--white) !important;
