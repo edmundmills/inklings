@@ -28,7 +28,9 @@ class User(AbstractUser, TimeStampedModel):
     friends = models.ManyToManyField('self', blank=True, symmetrical=True)
     intention = models.TextField(blank=True, null=True)
     intention_embedding = VectorField(dimensions=384, null=True)
-    received_friend_requests = models.ManyToManyField('self', through='FriendRequest', blank=True, symmetrical=False, related_name="received_requests")
+
+    class Meta:
+        abstract = False
 
     def send_friend_request(self, receiver):
         if not self.has_sent_request_to(receiver) and not self.is_friends_with(receiver):
@@ -60,6 +62,7 @@ class FriendRequest(TimeStampedModel):
     
     class Meta:
         unique_together = ['sender', 'receiver']
+        pass
 
     @classmethod
     def has_request_from_to(cls, sender, receiver):
@@ -423,7 +426,7 @@ class Query:
     embedding: np.ndarray
 
 
-class UserInvite(models.Model):
+class UserInvite(TimeStampedModel):
     # Status Choices
     PENDING = 'pending'
     ACCEPTED = 'accepted'
@@ -436,7 +439,6 @@ class UserInvite(models.Model):
     inviter = models.ForeignKey(User, related_name='sent_invites', on_delete=models.CASCADE)
     email = models.EmailField()
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Generates a unique UUID for every invite
-    date_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
 
     def __str__(self):
@@ -444,3 +446,4 @@ class UserInvite(models.Model):
 
     class Meta:
         unique_together = ['inviter', 'email']
+        pass

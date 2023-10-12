@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'app.User'
 
 # Application definition
 STATIC_ROOT = 'app/static/'
@@ -55,6 +54,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'inklings_prototype.urls'
+AUTH_USER_MODEL = 'app.User'
 
 TEMPLATES = [
     {

@@ -1,9 +1,8 @@
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .embeddings import generate_embedding
-from .models import Inkling, Link, LinkType, Memo, Reference, Tag
+from .models import Inkling, Link, Memo, Reference, Tag
 
 
 @receiver(post_save, sender=Inkling)

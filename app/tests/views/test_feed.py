@@ -1,8 +1,7 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from app.models import Inkling, Memo, Query, Reference, Tag
+from app.models import Inkling, Memo, Query, Reference, Tag, User
 
 
 class BaseFeedViewTest(TestCase):

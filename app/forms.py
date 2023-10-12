@@ -3,10 +3,10 @@ from typing import Any
 import requests
 from django import forms
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
-from django.contrib.auth.models import User
 from martor.fields import MartorFormField
 
-from .models import ContentType, Inkling, Link, LinkType, Memo, Reference, Tag
+from .models import (ContentType, Inkling, Link, LinkType, Memo, Reference,
+                     Tag, User)
 
 
 class SearchForm(forms.Form):
