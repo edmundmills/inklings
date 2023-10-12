@@ -13,16 +13,16 @@ from app.models import Inkling, Link, Memo, Query, Reference, Tag
 class FeedContentMixin(LinkedContentMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        feed_objects = []
         object = self.object # type: ignore
         user = self.request.user # type: ignore
-        for search_class in [Reference, Inkling, Memo]:
-            similar_nodes = get_similar_nodes(object, search_class, user, 10)
-            feed_objects.extend(similar_nodes)
         context['similar_tags'] = get_similar_tags(object, user, 10)
-        feed_objects += context['similar_tags']
-        feed_objects = sort_by_distance(object.embedding, feed_objects)
-        context['feed_objects'] = feed_objects
+        for privacy_level in ['own', 'friends', 'fof']:
+            feed_objects = []
+            for search_class in [Reference, Inkling, Memo]:
+                similar_nodes = get_similar_nodes(object, search_class, user, 10, privacy_level=privacy_level)
+                feed_objects.extend(similar_nodes)
+            feed_objects = sort_by_distance(object.embedding, feed_objects)
+            context[f'feed_objects_{privacy_level}'] = feed_objects
         return context
 
 
@@ -69,20 +69,23 @@ class QueryFeedView(FeedView):
 @login_required
 def new_feed_view(request):
     context = dict()
-    feed_objects = []
     user = request.user
 
-    for search_class in [Tag, Memo, Reference, Link, Inkling]:
-        feed_objects.extend(search_class.objects.filter(user=user).order_by('-updated_at')[:20])
+    for privacy_level in ['own', 'friends', 'fof']:
+        feed_objects = []
 
-    feed_objects = sorted(feed_objects, key=lambda x: x.updated_at, reverse=True)
+        for search_class in [Memo, Reference, Link, Inkling]:
+            recent = search_class.objects.filter(search_class.get_privacy_filter(user, privacy_level)).order_by('-updated_at')[:20]
+            feed_objects.extend(recent)
 
-    if user.intention_embedding is not None:
-        sorted_feed_objects = []
-        subsort_size = 10
-        for i in range(0, len(feed_objects), subsort_size):
-            sorted_feed_objects.extend(sort_by_distance(user.intention_embedding, feed_objects[i:i+subsort_size]))
-        feed_objects = sorted_feed_objects
-    
-    context['feed_objects'] = feed_objects
+        feed_objects = sorted(feed_objects, key=lambda x: x.updated_at, reverse=True)
+
+        if user.intention_embedding is not None:
+            sorted_feed_objects = []
+            subsort_size = 10
+            for i in range(0, len(feed_objects), subsort_size):
+                sorted_feed_objects.extend(sort_by_distance(user.intention_embedding, feed_objects[i:i+subsort_size]))
+            feed_objects = sorted_feed_objects
+        
+        context[f'feed_objects_{privacy_level}'] = feed_objects
     return render(request, 'feed/feed_new.html', context=context)
