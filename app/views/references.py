@@ -30,6 +30,8 @@ class ReferenceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         url = form.cleaned_data['url']
         self.object = create_reference_from_url(url, ChatGPT(), self.request.user)
+        self.object.privacy_setting = form.cleaned_data['privacy_setting']
+        self.object.save()
         self.object = add_metadata(self.object, self.completer)
         return HttpResponseRedirect(self.get_success_url())
 

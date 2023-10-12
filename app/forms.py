@@ -5,8 +5,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
 from martor.fields import MartorFormField
 
-from .models import (ContentType, Inkling, Link, LinkType, Memo, Reference,
-                     Tag, User)
+from .models import (ContentType, Inkling, Link, LinkType, Memo,
+                     PrivacySettingsModel, Reference, Tag, User)
 
 
 class FriendRequestForm(forms.Form):
@@ -50,10 +50,11 @@ class TagForm(forms.ModelForm):
 
 class MemoForm(forms.ModelForm):
     content = MartorFormField()
+    privacy_setting = forms.ChoiceField(choices=PrivacySettingsModel.PRIVACY_CHOICES, widget=forms.RadioSelect(), initial=PrivacySettingsModel.FRIENDS_OF_FRIENDS)
 
     class Meta:
         model = Memo
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'privacy_setting']
 
 
 class UserCreationForm(BaseUserCreationForm):
@@ -99,6 +100,7 @@ class URLReferenceForm(forms.Form):
             'invalid': "Please enter a valid URL.",
         }
     )
+    privacy_setting = forms.ChoiceField(choices=PrivacySettingsModel.PRIVACY_CHOICES, widget=forms.RadioSelect(), initial=PrivacySettingsModel.FRIENDS_OF_FRIENDS)
 
     # def clean_url(self):
     #     url = self.cleaned_data.get('url')
@@ -121,10 +123,11 @@ class LinkTypeForm(forms.ModelForm):
 
 class InklingForm(forms.ModelForm):
     title = forms.CharField(required=False)
+    privacy_setting = forms.ChoiceField(choices=PrivacySettingsModel.PRIVACY_CHOICES, widget=forms.RadioSelect(), initial=PrivacySettingsModel.FRIENDS_OF_FRIENDS)
 
     class Meta:
         model = Inkling
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'privacy_setting']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3}),
         }

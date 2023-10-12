@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <nav id="sidebar" class="bg-secondary sidebar-secondary sidebar h-100" style="min-width: 55px; max-width: 55px;">
     <div class="text-center my-1">
         <a href="#" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#createInklingModal" title="New Inkling"><i class="bi bi-pen"></i></a>
@@ -26,8 +27,11 @@
                 <form id="createInklingForm" method="post" action="{% url 'inkling_create' %}">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <input class="form-control mb-2" id="title" name="title"></input>
-                        <textarea class="form-control" id="content" name="content" rows="12" required></textarea>
+                        <div class="mb-2">
+                            {{ new_inkling_form.title|as_bootstrap }}
+                        </div>
+                        <textarea class="form-control mb-2" id="content" name="content" rows="12" required></textarea>
+                        {{ new_inkling_form.privacy_setting }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -51,6 +55,10 @@
                     <div class="mb-3 form-group">
                         <label class="form-label">Reference URL</label>
                         <input class="form-control" id="url" name="url"></input>
+                        
+                    </div>
+                    <div class="mb-2">
+                        {{ new_reference_form.privacy_setting }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

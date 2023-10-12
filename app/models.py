@@ -32,26 +32,26 @@ class User(AbstractUser, TimeStampedModel):
     class Meta:
         abstract = False
 
-    def send_friend_request(self, receiver):
+    def send_friend_request(self, receiver: 'User'):
         if not self.has_sent_request_to(receiver) and not self.is_friends_with(receiver):
             FriendRequest.objects.create(sender=self, receiver=receiver)
 
-    def accept_friend_request(self, sender):
+    def accept_friend_request(self, sender: 'User'):
         if sender.has_sent_request_to(self):
             self.friends.add(sender)
             sender.friends.add(self)
             FriendRequest.objects.filter(sender=sender, receiver=self).delete()
 
-    def reject_friend_request(self, sender):
+    def reject_friend_request(self, sender: 'User'):
         FriendRequest.objects.filter(sender=sender, receiver=self).delete()
 
-    def remove_friend(self, friend):
+    def remove_friend(self, friend: 'User'):
         self.friends.remove(friend)
 
-    def is_friends_with(self, friend):
+    def is_friends_with(self, friend: 'User'):
         return friend in self.friends.all()
 
-    def has_sent_request_to(self, receiver):
+    def has_sent_request_to(self, receiver: 'User'):
         return FriendRequest.objects.filter(sender=self, receiver=receiver).exists()
 
 
@@ -139,7 +139,7 @@ class PrivacySettingsModel(UserOwnedModel):
         """
         Return a Q object representing objects owned by the friends of the given user.
         """
-        return Q(privacy_setting=cls.FRIENDS, user__friends=user)
+        return Q(privacy_setting=cls.FRIENDS, user__friends=user) | Q(privacy_setting=cls.FRIENDS_OF_FRIENDS, user__friends=user)
 
     @classmethod
     def _get_friends_of_friends_objects_filter(cls, user) -> Q:

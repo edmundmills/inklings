@@ -48,7 +48,7 @@ class BaseNodeTable(EditableMixin, tables.Table):
     class Meta:
         model = NodeModel
         template_name = TEMPLATE_NAME
-        fields = ("title", "tags", "links")
+        fields = ("title", "privacy_setting", "tags", "links")
 
     def render_title(self, record):
         return link_to_object_html(record)
