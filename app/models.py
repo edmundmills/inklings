@@ -450,3 +450,11 @@ class UserInvite(TimeStampedModel):
     class Meta:
         unique_together = ['inviter', 'email']
         pass
+
+    def get_absolute_url(self):
+        return reverse('invite_view', args=[str(self.pk)])
+    
+    @property
+    def link(self):
+        # returns the full url with the token, including https://sitename.com
+        return reverse('signup') + f'?invite_token={self.token}'

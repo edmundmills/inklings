@@ -3,7 +3,8 @@ from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.utils.html import format_html, mark_safe  # type: ignore
 
-from .models import Inkling, Link, LinkType, Memo, NodeModel, Reference, Tag
+from .models import (FriendRequest, Inkling, Link, LinkType, Memo, NodeModel,
+                     Reference, Tag, User, UserInvite)
 
 TEMPLATE_NAME = "django_tables2/bootstrap5.html"
 
@@ -103,3 +104,35 @@ class TagTable(tables.Table):
     def render_actions(self, record):
         csrf_token = get_token(self.context['request']) # type: ignore
         return delete_action_html(record, csrf_token)
+
+
+class FriendsTable(tables.Table):
+    class Meta:
+        model = User
+        template_name = TEMPLATE_NAME
+        fields = ("username", "email")
+
+
+class ReceivedFriendRequestTable(tables.Table):
+    class Meta:
+        model = FriendRequest
+        template_name = TEMPLATE_NAME
+        fields = ("sender", "created_at")
+
+
+class SentFriendRequestTable(tables.Table):
+    class Meta:
+        model = FriendRequest
+        template_name = TEMPLATE_NAME
+        fields = ("receiver", "created_at")
+
+class SentInvitesTable(tables.Table):
+    # link = tables.Column(empty_values=(), orderable=False, verbose_name='Link')
+
+    class Meta:
+        model = UserInvite
+        template_name = TEMPLATE_NAME
+        fields = ("email", "link", "created_at")
+
+    def render_link(self, record):
+        return mark_safe(f'<a href="{record.link}">{record.link}</a>')

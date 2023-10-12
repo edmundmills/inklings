@@ -1,0 +1,23 @@
+<div class="modal fade" id="inviteFriendModal" tabindex="-1" aria-labelledby="inviteFriendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="inviteFriendModalLabel">Invite a Friend</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="inviteFriendForm" method="post" action="{% url 'send_invite' %}">
+          <div class="modal-body">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="inviteFriendForm" class="btn btn-primary">Send Invite</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    </div>
+    

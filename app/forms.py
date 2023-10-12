@@ -9,6 +9,10 @@ from .models import (ContentType, Inkling, Link, LinkType, Memo, Reference,
                      Tag, User)
 
 
+class FriendRequestForm(forms.Form):
+    email = forms.EmailField(label='Email', max_length=255)
+
+
 class SearchForm(forms.Form):
     query = forms.CharField(
         max_length=255, 

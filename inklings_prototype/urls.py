@@ -12,6 +12,8 @@ urlpatterns = [
     path('accounts/intention/', views.get_intention, name='get_intention'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='auth/login.html', next_page='home'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('accounts/send_invite/', views.invite_user, name='send_invite'),
+    path('accounts/friends/', views.FriendsListView.as_view(), name='friends'),
 
     path('memos/', views.MemoListView.as_view(), name='memos'),
     path('memo/<int:pk>/', views.MemoFeedView.as_view(), name='memo_view'),

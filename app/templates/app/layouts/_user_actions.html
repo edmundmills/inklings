@@ -1,7 +1,9 @@
 <div class="dropdown">
-    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ user.username }} <i class="bi bi-person-circle"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li><a class="dropdown-item" href="{% url 'logout' %}">Sign Out</a></li>
-    </ul>
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ user.username }} <i class="bi bi-person-circle"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="{% url 'friends' %}">Friends</a></li>
+    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#inviteFriendModal">Invite Friend</a></li>
+    <li><a class="dropdown-item" href="{% url 'logout' %}">Sign Out</a></li>
+  </ul>
 </div>
