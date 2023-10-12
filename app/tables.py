@@ -2,6 +2,7 @@ import django_tables2 as tables
 from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.utils.html import format_html, mark_safe  # type: ignore
+from django_tables2.utils import A
 
 from .models import (FriendRequest, Inkling, Link, LinkType, Memo, NodeModel,
                      Reference, Tag, User, UserInvite)
@@ -17,24 +18,32 @@ def delete_action_html(record, csrf_token):
     return format_html(
         '''<form method="post" action="{}" onsubmit="return confirm('Are you sure you want to delete this {}?');">
             <input type="hidden" name="csrfmiddlewaretoken" value="{}">
-            <button type="submit" class="btn btn-sm" name="Delete">Delete</button>
+            <button type="submit" class="btn btn-sm btn-outline-danger" name="Delete">Delete</button>
             </form>''',
         delete_url,
         record.__class__.__name__,
         csrf_token
     )
 
-def edit_action_html(record):
-    edit_url = reverse(f'{record._meta.model_name}_edit', args=[record.pk])
-    return format_html(
-        '<a href="{}">Edit</a>',
-        edit_url,
-    )
 
-class BaseNodeTable(tables.Table):
+class EditableMixin(tables.Table):
+    edit = tables.LinkColumn(f'home', text='Edit', orderable=False, empty_values=[], attrs={'a': {'class': 'text-primary'}})
+    delete = tables.Column(empty_values=(), orderable=False, verbose_name='Delete')
+
+    def render_delete(self, record):
+        csrf_token = get_token(self.context['request']) # type: ignore
+        return delete_action_html(record, csrf_token)
+
+    def render_edit(self, record):
+        model_name = record._meta.model_name
+        edit_url_pattern_name = f'{model_name}_edit'        
+        edit_url = reverse(edit_url_pattern_name, args=[record.pk])
+        return format_html('<a href="{}">Edit</a>', edit_url)
+
+
+class BaseNodeTable(EditableMixin, tables.Table):
     tags = tables.Column(empty_values=(), orderable=False)
     links = tables.Column(empty_values=(), orderable=False)
-    actions = tables.Column(empty_values=(), orderable=False, verbose_name='Actions')
 
     class Meta:
         model = NodeModel
@@ -49,11 +58,6 @@ class BaseNodeTable(tables.Table):
 
     def render_links(self, record):
         return mark_safe(", ".join(link_to_object_html(other) for other in record.all_linked_objects()))
-    
-    def render_actions(self, record):
-        csrf_token = get_token(self.context['request']) # type: ignore
-        return delete_action_html(record, csrf_token)
-
 
 
 class ReferenceTable(BaseNodeTable):
@@ -64,20 +68,20 @@ class ReferenceTable(BaseNodeTable):
 class InklingTable(BaseNodeTable):
     class Meta(BaseNodeTable.Meta):
         model = Inkling
-        fields = ("title", "content", "created_at", "updated_at", "actions")
+        fields = ("title", "content", "created_at", "updated_at")
 
 class MemoTable(BaseNodeTable):
     class Meta(BaseNodeTable.Meta):
         model = Memo
-        fields = ("title", "summary", "created_at", "updated_at", "actions")
+        fields = ("title", "summary", "created_at", "updated_at")
 
-class LinkTypeTable(tables.Table):
+class LinkTypeTable(EditableMixin, tables.Table):
     class Meta:
         model = LinkType
         template_name = TEMPLATE_NAME
         fields = ("name", "reverse_name", "created_at", "updated_at")
 
-class LinkTable(tables.Table):
+class LinkTable(EditableMixin, tables.Table):
     class Meta:
         model = Link
         template_name = TEMPLATE_NAME
@@ -93,17 +97,11 @@ class LinkTable(tables.Table):
         return record.link_type.name
 
 
-class TagTable(tables.Table):
-    actions = tables.Column(empty_values=(), orderable=False, verbose_name='Actions')
-
+class TagTable(EditableMixin, tables.Table):
     class Meta:
         model = Tag
         template_name = TEMPLATE_NAME
         fields = ("name", "created_at", "updated_at")
-
-    def render_actions(self, record):
-        csrf_token = get_token(self.context['request']) # type: ignore
-        return delete_action_html(record, csrf_token)
 
 
 class FriendsTable(tables.Table):
@@ -114,21 +112,24 @@ class FriendsTable(tables.Table):
 
 
 class ReceivedFriendRequestTable(tables.Table):
+    accept = tables.LinkColumn('accept_friend_request', args=[A('pk')], orderable=False, empty_values=[], text='Accept', attrs={'a': {'class': 'text-success'}})
+    delete = tables.LinkColumn('delete_friend_request', args=[A('pk')], orderable=False, empty_values=[], text='Decline', attrs={'a': {'class': 'text-danger'}})
+    
     class Meta:
         model = FriendRequest
         template_name = TEMPLATE_NAME
-        fields = ("sender", "created_at")
-
+        fields = ("sender", "created_at", "accept", "delete")
 
 class SentFriendRequestTable(tables.Table):
+    delete = tables.LinkColumn('delete_friend_request', args=[A('pk')], orderable=False, empty_values=[], text='Delete', attrs={'a': {'class': 'text-danger'}})
+    
     class Meta:
         model = FriendRequest
         template_name = TEMPLATE_NAME
-        fields = ("receiver", "created_at")
+        fields = ("receiver", "created_at", "delete")
+
 
 class SentInvitesTable(tables.Table):
-    # link = tables.Column(empty_values=(), orderable=False, verbose_name='Link')
-
     class Meta:
         model = UserInvite
         template_name = TEMPLATE_NAME

@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -25,10 +26,20 @@ def signup_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            invite_token = form.cleaned_data.get('invite_token')
+            invites = []
+            if invite_token:
+                invites.append(get_object_or_404(UserInvite, token=invite_token))
+            invites.extend(UserInvite.objects.filter(email=user.email).all())
+            for invite in invites:
+                inviter = invite.inviter
+                inviter.send_friend_request(user)
+                invite.delete()
             login(request, user)
             return redirect('get_intention')
     else:
-        form = UserCreationForm()
+        invite_token = request.GET.get('invite_token')
+        form = UserCreationForm(initial={'invite_token': invite_token})
     return render(request, 'auth/signup.html', {'form': form})
 
 @login_required
@@ -85,3 +96,25 @@ class FriendsListView(LoginRequiredMixin, ListView):
         context['received_friend_requests_table'] = ReceivedFriendRequestTable(FriendRequest.objects.filter(receiver=user))
         context['sent_invites_table'] = SentInvitesTable(UserInvite.objects.filter(inviter=user))
         return context
+
+
+@login_required
+def accept_friend_request(request, pk):
+    friend_request = get_object_or_404(FriendRequest, id=pk, receiver=request.user)
+    request.user.accept_friend_request(friend_request.sender)
+    messages.success(request, f'You are now friends with {friend_request.sender.username}!')
+    friend_request.delete()
+    return redirect('friends')
+
+@login_required
+def delete_friend_request(request, pk):
+    friend_request = get_object_or_404(FriendRequest, id=pk)
+    if friend_request.sender == request.user:
+        friend_request.delete()
+        messages.info(request, f'Friend request from {friend_request.sender.username} has been deleted.')
+    elif friend_request.receiver == request.user:
+        friend_request.delete()
+        messages.info(request, f'Friend request to {friend_request.receiver.username} has been deleted.')
+    else:
+        messages.error(request, f'You do not have permission to delete this friend request.')
+    return redirect('friends')

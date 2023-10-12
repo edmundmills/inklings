@@ -58,10 +58,11 @@ class MemoForm(forms.ModelForm):
 
 class UserCreationForm(BaseUserCreationForm):
     email = forms.EmailField(required=True, help_text="Required. Enter a valid email address.")
+    invite_token = forms.CharField(required=False, widget=forms.HiddenInput(), max_length=255)
 
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2")
+        fields = ("username", "email", "password1", "password2", "invite_token")
 
     def save(self, commit=True):
         user = super().save(commit=False)

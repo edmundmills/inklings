@@ -14,6 +14,8 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('accounts/send_invite/', views.invite_user, name='send_invite'),
     path('accounts/friends/', views.FriendsListView.as_view(), name='friends'),
+    path('accounts/accept_request/<int:pk>/', views.accept_friend_request, name='accept_friend_request'),
+    path('accounts/delete_request/<int:pk>/', views.delete_friend_request, name='delete_friend_request'),
 
     path('memos/', views.MemoListView.as_view(), name='memos'),
     path('memo/<int:pk>/', views.MemoFeedView.as_view(), name='memo_view'),
