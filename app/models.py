@@ -326,6 +326,9 @@ class Link(NodeModel, PrivacySettingsModel):
     def get_list_url(cls):
         return reverse('links')
 
+    def get_absolute_url(self):
+        return reverse('link_view', args=[self.pk])
+
     def is_viewable_by(self, user: User, privacy_level: str = 'fof') -> bool:
         return self.source_content_object.is_viewable_by(user, privacy_level) and self.target_content_object.is_viewable_by(user, privacy_level) # type: ignore
 

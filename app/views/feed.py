@@ -51,6 +51,11 @@ class ReferenceFeedView(FeedView):
     template_name = 'feed/feed_reference.html'
 
 
+class LinkFeedView(FeedView):
+    model = Link # type: ignore
+    template_name = 'feed/feed_link.html'
+
+
 class QueryFeedView(FeedView):
     model = Query # type: ignore
     template_name = 'feed/feed_query.html'
@@ -59,6 +64,7 @@ class QueryFeedView(FeedView):
         query = self.request.GET.get('query')
         embedding = generate_embedding(query)
         return Query(query, embedding) # type: ignore
+
 
 @login_required
 def new_feed_view(request):
@@ -71,7 +77,7 @@ def new_feed_view(request):
 
     feed_objects = sorted(feed_objects, key=lambda x: x.updated_at, reverse=True)
 
-    if user.intention_embedding:
+    if user.intention_embedding is not None:
         sorted_feed_objects = []
         subsort_size = 10
         for i in range(0, len(feed_objects), subsort_size):

@@ -36,6 +36,7 @@ urlpatterns = [
     
     path('links/', views.LinkListView.as_view(), name='links'),
     path('links/create/', views.CreateLinkView.as_view(), name='link_create'),
+    path('link/<int:pk>/', views.LinkFeedView.as_view(), name='link_view'),
     path('link/<int:pk>/delete/', views.DeleteLinkView.as_view(), name='link_delete'),
     
     path('link_types/', views.LinkTypeListView.as_view(), name='link_types'),
