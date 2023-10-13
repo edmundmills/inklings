@@ -14,7 +14,7 @@ MODEL = None
 def load_model():
     global MODEL
     if MODEL is None:
-        MODEL = SentenceTransformer('all-MiniLM-L12-v2')
+        MODEL = SentenceTransformer('BAAI/bge-small-en-v1.5')
     return MODEL
 
 
