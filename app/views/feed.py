@@ -6,7 +6,8 @@ from django.views.generic import DetailView
 
 from app.embeddings import (generate_embedding, get_similar_nodes,
                             get_similar_tags, sort_by_distance)
-from app.mixins import LinkedContentMixin, UserScopedMixin
+from app.forms import InklingForm
+from app.mixins import LinkedContentMixin, PrivacyScopedMixin, UserScopedMixin
 from app.models import Inkling, Link, Memo, Query, Reference, Tag
 
 
@@ -15,6 +16,8 @@ class FeedContentMixin(LinkedContentMixin):
         context = super().get_context_data(**kwargs)
         object = self.object # type: ignore
         user = self.request.user # type: ignore
+        context['current_user'] = user
+        context['hatch_inkling_form'] = InklingForm()
         context['similar_tags'] = get_similar_tags(object, user, 10)
         for privacy_level in ['own', 'friends', 'fof']:
             feed_objects = []
@@ -27,7 +30,7 @@ class FeedContentMixin(LinkedContentMixin):
 
 
 
-class FeedView(LoginRequiredMixin, UserScopedMixin, FeedContentMixin, DetailView):
+class FeedView(LoginRequiredMixin, PrivacyScopedMixin, FeedContentMixin, DetailView):
     pass
 
 
@@ -70,7 +73,7 @@ class QueryFeedView(FeedView):
 def new_feed_view(request):
     context = dict()
     user = request.user
-
+    context['current_user'] = user
     for privacy_level in ['own', 'friends', 'fof']:
         feed_objects = []
 

@@ -37,10 +37,13 @@ class DeleteInklingView(LoginRequiredMixin, RedirectBackMixin, UserScopedMixin, 
 def create_inkling_and_link(request):
     if not request.method == "POST":
         return redirect('/')
+    print(request.POST)
     inkling_form = InklingForm(request.POST)
     link_form = LinkForm(request.POST)
+    print(inkling_form.is_valid(), link_form.is_valid())
     if not (inkling_form.is_valid() and link_form.is_valid()):
         return redirect('/')
+    print(inkling_form.cleaned_data)
     inkling_instance = inkling_form.save(commit=False)
     inkling_instance.user = request.user 
     inkling_instance.save()

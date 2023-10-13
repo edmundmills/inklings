@@ -6,7 +6,9 @@
             </div>
             {% include '_memo_actions.html' with memo=memo %}
         </div>
-        {% include 'tag/_list_span.html' with tags=memo.tags.all %}
+        {% load custom_filters %}
+        {% tags_for_user object current_user as user_tags %}
+        {% include 'tag/_list_span.html' with tags=user_tags %}
 
         <div>{{ memo.content|safe_markdown }}</div>
     </div>

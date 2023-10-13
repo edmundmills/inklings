@@ -15,7 +15,7 @@ class DeleteTagView(LoginRequiredMixin, RedirectBackMixin, UserScopedMixin, Dele
     success_url = '/'
 
 
-class UpdateTagView(LoginRequiredMixin, UpdateView):
+class UpdateTagView(LoginRequiredMixin, UserScopedMixin, UpdateView):
     model = Tag
     form_class = TagForm
 
@@ -64,13 +64,10 @@ def merge_tags(request):
 
 @login_required
 def add_tag(request):
-    print('testing view')
     if request.method != 'POST':
         return redirect('/')
     form = TagForm(request.POST)
-    print(request.POST)
     if not form.is_valid():
-        print(form.errors)
         return redirect('/')
     tag, _created = Tag.objects.get_or_create(name=form.cleaned_data['name'], user=request.user)
     target_class = form.cleaned_data['target_class_name']

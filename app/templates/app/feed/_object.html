@@ -1,6 +1,9 @@
 {% load custom_filters %}
 {% load martortags %}
 <div class="card bg-white mb-2">
+    {% if object.user != user %}
+        {% include 'components/_user_card_header.html' with object=object %}
+    {% endif %}
     <div class="card-body">
         <div class="d-flex flex-row">
             <div class="text-dark fs-5 text-info mx-1">

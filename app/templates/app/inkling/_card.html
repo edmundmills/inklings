@@ -1,4 +1,7 @@
 <div class="card border-dark bg-white">
+    {% if inkling.user != current_user %}
+        {% include 'components/_user_card_header.html' with object=inkling %}
+    {% endif %}
     <div class="card-body">
         <div class="d-flex flex-row">
             <div class="flex-grow-1">
@@ -12,6 +15,8 @@
         </div>
     </div>
     <div class="card-footer">
-        {% include 'tag/_list_span.html' with tags=inkling.tags.all %}
+        {% load custom_filters %}
+        {% tags_for_user object current_user as user_tags %}
+        {% include 'tag/_list_span.html' with tags=user_tags %}
     </div>
 </div>

@@ -243,6 +243,9 @@ class TaggableModel(UserOwnedModel):
 
     class Meta:
         abstract = True
+    
+    def tags_for_user(self, user: User) -> list['Tag']:
+        return list(self.tags.filter(user=user))
 
 
 class NodeModel(EmbeddableModel, TaggableModel, PrivacySettingsModel, TimeStampedModel):
@@ -254,10 +257,11 @@ class NodeModel(EmbeddableModel, TaggableModel, PrivacySettingsModel, TimeStampe
 
     def all_links(self):
         content_type = ContentType.objects.get_for_model(self)
+        privacy_filter = self.get_privacy_filter(self.user, 'fof')
         return Link.objects.filter(
             models.Q(source_content_type=content_type, source_object_id=self.pk) |
             models.Q(target_content_type=content_type, target_object_id=self.pk)
-        ).select_related('link_type')
+        ).select_related('link_type').filter(privacy_filter)
 
     def all_linked_objects(self) -> list['NodeModel']:
         objects = []

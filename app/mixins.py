@@ -1,13 +1,14 @@
 
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from pgvector.django import CosineDistance
 
 from app.embeddings import generate_embedding
 from app.prompting import ChatGPT, Completer, get_generated_metadata
 
-from .models import (EmbeddableModel, NodeModel, SummarizableModel,
-                     TaggableModel, TitleAndContentModel, UserOwnedModel)
+from .models import (EmbeddableModel, NodeModel, PrivacySettingsModel,
+                     SummarizableModel, TaggableModel, TitleAndContentModel,
+                     UserOwnedModel)
 
 
 def add_metadata(object: UserOwnedModel, completer: Completer):
@@ -60,6 +61,15 @@ class UserScopedMixin:
         return self.model.objects.filter(user=self.request.user) # type: ignore
 
 
+class PrivacyScopedMixin:
+    def get_queryset(self):
+        if issubclass(self.model, PrivacySettingsModel): # type: ignore
+            filter = self.model.get_privacy_filter(self.request.user, 'fof') # type: ignore
+        else:
+            filter = Q(user=self.request.user) # type: ignore
+        return self.model.objects.filter(filter) # type: ignore
+
+
 class LinkedContentMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) # type: ignore
@@ -67,4 +77,3 @@ class LinkedContentMixin:
             context['linked_content'] = self.object.get_link_groups() # type: ignore
         return context
     
-

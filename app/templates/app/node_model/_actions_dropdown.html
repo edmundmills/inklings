@@ -7,12 +7,14 @@
       <li>
         {% include 'node_model/_add_tag.html' with object=object %}
       </li>
-      <li>
-        {% include 'node_model/_edit_link.html' with object=object %}
-      </li>
-      <li>
-        {% include 'node_model/_delete_form.html' with object=object %}
-      </li>
+      {% if current_user == object.user %}
+        <li>
+          {% include 'node_model/_edit_link.html' with object=object %}
+        </li>
+        <li>
+          {% include 'node_model/_delete_form.html' with object=object %}
+        </li>
+      {% endif %}
     </ul>
 </div>
 {% include 'node_model/_create_inkling_modal.html' with object=object %}

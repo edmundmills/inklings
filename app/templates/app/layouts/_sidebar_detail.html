@@ -1,9 +1,13 @@
+{% load custom_filters %}
 <nav id="sidebar" class="col-3 bg-light sidebar-light sidebar h-100 p-2" style="overflow-y: auto;">
-    {% if object.tags.all.exists %}
-        <div class="mb-2">
-            <h5>Tags</h5>
-            {% include 'tag/_list.html' with tags=object.tags.all %}
-        </div>
+    {% if object.tags.exists %}
+        {% tags_for_user object current_user as user_tags %}
+        {% if user_tags %}
+            <div class="mb-2">
+                <h5>Tags</h5>
+                {% include 'tag/_list.html' with tags=user_tags %}
+            </div>
+        {% endif %}
     {% endif %}
 
     {% for link_type_and_direction, linked in linked_content.items %}

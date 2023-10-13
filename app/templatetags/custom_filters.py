@@ -2,6 +2,8 @@ from django import template
 from django.contrib.contenttypes.models import ContentType
 from django.forms import BoundField
 
+from app.models import TaggableModel, User
+
 register = template.Library()
 
 @register.filter(name='as_bootstrap')
@@ -21,3 +23,7 @@ def class_name(value):
 @register.filter(name='content_type_id')
 def content_type_id(value):
     return ContentType.objects.get_for_model(value).id
+
+@register.simple_tag
+def tags_for_user(object: TaggableModel, user: User):
+    return object.tags_for_user(user=user)

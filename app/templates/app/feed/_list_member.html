@@ -2,6 +2,11 @@
 {% load martortags %}
 
 <li class="d-flex flex-row">
+    <div>
+        {% if current_user != object.user %}
+            {% include 'components/_user_pill.html' with object=object %}
+        {% endif %}
+    </div>
     <div class="text-dark text-info mx-1">
         {% include 'components/_icon.html' with object=object %}
     </div>            
@@ -9,5 +14,5 @@
         <a href="{% url object|class_name|add:'_view' object.pk %}">
             {{ object.title }}
         </a>    
-    </div>
+    </div>    
 </li>
