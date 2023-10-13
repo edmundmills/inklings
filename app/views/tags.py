@@ -19,6 +19,14 @@ class UpdateTagView(LoginRequiredMixin, UserScopedMixin, UpdateView):
     model = Tag
     form_class = TagForm
 
+    def form_valid(self, form):
+        tag = form.save(commit=False)
+        existing_tag = Tag.objects.filter(name=tag.name, user=self.request.user).first()
+        if existing_tag:
+            return redirect(existing_tag.get_absolute_url())
+        tag.save()
+        return redirect(tag.get_absolute_url())
+
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
