@@ -16,7 +16,7 @@ class MemoCreateAndRedirectToEditView(View, LoginRequiredMixin):
 
 class MemoEditView(LoginRequiredMixin, UserScopedMixin, GenerateTitleAndTagsMixin, UpdateView):
     model = Memo
-    fields = ['title', 'content']
+    fields = ['title', 'content', 'privacy_setting']
     template_name = 'memo/edit.html'
 
     def get_success_url(self) -> str:

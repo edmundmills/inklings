@@ -5,16 +5,18 @@
 <div class="container-fluid h-100">
     <form method="post" action="{% url 'memo_edit' memo.id %}" class="memo-form d-flex flex-column h-100">
         {% csrf_token %}
-        <div class="d-flex flex-row">
+        <div class="d-flex flex-row mb-2">
             <div class="form-group flex-grow-1">
                 {{ form.title|as_bootstrap }}
-            </div>
+            </div>    
             <div class="">
                 <button href="{% url 'memo_view' memo.id %}" class="btn btn-outline-secondary mx-1" name="Cancel"><i class="bi bi-slash-lg"></i></button>
                 <button type="submit" class="btn btn-primary"><i class="bi bi-floppy-fill"></i></button>
             </div>
         </div>
-
+        <div class="form-group col-3 mb-2">
+            {{ form.privacy_setting|as_bootstrap }}
+        </div>
         <div class="form-group flex-grow-1">
             {{ form.content }}
         </div>
