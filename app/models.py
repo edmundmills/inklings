@@ -255,26 +255,29 @@ class NodeModel(EmbeddableModel, TaggableModel, PrivacySettingsModel, TimeStampe
     class Meta:
         abstract = True
 
-    def all_links(self):
+    def all_links(self, user: Optional[User] = None):
         content_type = ContentType.objects.get_for_model(self)
-        privacy_filter = self.get_privacy_filter(self.user, 'fof')
-        return Link.objects.filter(
+        user = self.user if user is None else user
+        privacy_filter = Link.get_privacy_filter(user, 'fof')
+        links = Link.objects.filter(
             models.Q(source_content_type=content_type, source_object_id=self.pk) |
             models.Q(target_content_type=content_type, target_object_id=self.pk)
-        ).select_related('link_type').filter(privacy_filter)
+        ).select_related('link_type')
+        print(links.all())
+        return links.filter(privacy_filter)
 
-    def all_linked_objects(self) -> list['NodeModel']:
+    def all_linked_objects(self, user: Optional[User] = None) -> list['NodeModel']:
         objects = []
-        for link in self.all_links():
+        for link in self.all_links(user=user):
             if link.target_content_object == self:
                 objects.append(link.source_content_object)
             else:
                 objects.append(link.target_content_object)
         return objects
 
-    def get_link_groups(self) -> dict[tuple[LinkType, str], list['NodeModel']]:
+    def get_link_groups(self, user: Optional[User] = None) -> dict[tuple[LinkType, str], list['NodeModel']]:
         link_groups = defaultdict(list)
-        for link in self.all_links():
+        for link in self.all_links(user):
             direction = "outgoing" if link.source_content_object == self else "incoming"
             key = (link.link_type, direction)
             target = link.target_content_object if direction == "outgoing" else link.source_content_object

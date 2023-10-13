@@ -74,6 +74,6 @@ class LinkedContentMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) # type: ignore
         if isinstance(self.object, NodeModel): # type: ignore
-            context['linked_content'] = self.object.get_link_groups() # type: ignore
+            context['linked_content'] = self.object.get_link_groups(self.request.user) # type: ignore
         return context
     
