@@ -206,12 +206,12 @@ class EmbeddableModel(models.Model):
     def get_similar_objects(cls, embedding, user: User, 
                             exclude_filter: Optional[Q] = None,
                             limit: Optional[int] = None,
-                            filter_theshold: float = 0.7,
+                            distance_threshold: float = 0.6,
                             privacy_level: str = 'own') -> models.QuerySet:
 
         queryset = (cls.objects
                     .alias(distance=CosineDistance('embedding', embedding))
-                    .filter(distance__lt=filter_theshold)
+                    .filter(distance__lt=distance_threshold)
                     .order_by('distance'))
     
         if issubclass(cls, PrivacySettingsModel):
