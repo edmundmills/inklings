@@ -43,7 +43,8 @@ def generate_embedding(text: str, title: Optional[str] = None) -> np.array: # ty
         chunks += [title]
     embeddings = model.encode(chunks)
     mean_embedding = np.mean(embeddings, axis=0)
-    return mean_embedding
+    embedding = mean_embedding / np.linalg.norm(mean_embedding)
+    return embedding
 
 
 def sort_by_distance(embedding, objects: list):
