@@ -3,7 +3,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 
 @dataclass
@@ -34,7 +36,7 @@ class ChatGPT(Completer):
     model: str = 'gpt-3.5-turbo'
 
     def __call__(self, messages: list[dict[str, str]]) -> dict:
-        completion = openai.ChatCompletion.create(model=self.model, messages=messages, temperature=self.temperature)
+        completion = client.chat.completions.create(model=self.model, messages=messages, temperature=self.temperature)
         content = completion.choices[0].message.content # type: ignore
         print(content)
         return json.loads(content)
