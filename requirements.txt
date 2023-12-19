@@ -12,3 +12,4 @@ requests
 readability-lxml
 beautifulsoup4
 unidecode
+gunicorn
