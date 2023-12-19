@@ -15,3 +15,4 @@ readability-lxml
 beautifulsoup4
 unidecode
 gunicorn
+dj-database-url
