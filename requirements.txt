@@ -16,3 +16,4 @@ beautifulsoup4
 unidecode
 gunicorn
 dj-database-url
+whitenoise
