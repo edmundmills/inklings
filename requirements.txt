@@ -1,3 +1,4 @@
+torch
 pgvector
 django
 numpy
